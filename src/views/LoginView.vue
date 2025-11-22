@@ -94,14 +94,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/authStore'
-import { storeToRefs } from 'pinia'
+import { useAuth } from '@/composables/useAuth'
 
 const router = useRouter()
-const authStore = useAuthStore()
-const { isAdmin,isAssistant } = storeToRefs(authStore)
+const { login, isAdmin, isAssistant } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -113,7 +109,7 @@ async function handleSubmit() {
   error.value = null
   loading.value = true
 
-  const result = await authStore.login(email.value, password.value)
+  const result = await login(email.value, password.value)
 
   loading.value = false
 

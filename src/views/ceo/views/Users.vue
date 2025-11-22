@@ -313,15 +313,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
 import { userTableFields } from "@/views/ceo/data/table.fields";
 import { ceoUserService } from "@/views/ceo/services/userService";
 import EditUserModal from "@/views/ceo/components/users/EditUserModal.vue";
 import RejectPhotoModal from "@/views/ceo/components/users/RejectPhotoModal.vue";
 import RejectAccountModal from "@/views/ceo/components/users/RejectAccountModal.vue";
-import type { User } from "@/types/user";
+import type { User } from "@/interfaces";
 import ImagePreview from '@/components/ImagePreview.vue';
-import { useAlert } from '@/composables/useAlert';
 
 const { toast, confirmDelete, confirm } = useAlert();
 
@@ -625,9 +623,16 @@ const rejectUser = (user: User) => {
   showRejectAccountModal.value = true;
 };
 
-onMounted(() => {
-  fetchUsers();
-  updateStats();
+onMounted(async () => {
+  addPreloader();
+  try {
+    await fetchUsers();
+    await updateStats();
+  } catch (error) {
+    console.error('Error en onMounted:', error);
+  } finally {
+    removePreloader();
+  }
 });
 
 watch(selectedTab, (oldValue, newValue) => {
