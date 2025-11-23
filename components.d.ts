@@ -31,10 +31,12 @@ declare module 'vue' {
     BTable: typeof import('bootstrap-vue-next/components/BTable')['BTable']
     GamerSidebar: typeof import('./src/components/GamerSidebar.vue')['default']
     GroupCard: typeof import('./src/components/GroupCard.vue')['default']
+    Groups: typeof import('./src/components/Groups.vue')['default']
     ImagePreview: typeof import('./src/components/ImagePreview.vue')['default']
     Preloader: typeof import('./src/components/Preloader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    UserDetailModal: typeof import('./src/components/UserDetailModal.vue')['default']
     UserGrid: typeof import('./src/components/UserGrid.vue')['default']
   }
   export interface GlobalDirectives {

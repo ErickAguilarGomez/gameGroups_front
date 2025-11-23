@@ -17,7 +17,7 @@ export default [
       {
         path: 'groups',
         name: 'UserGroups',
-        component: () => import('@/views/shared/components/Groups.vue'),
+        component: () => import('@/components/Groups.vue'),
         meta: { title: 'Grupos' }
       }
     ]

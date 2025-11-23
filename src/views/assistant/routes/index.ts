@@ -19,7 +19,7 @@ export default [
       {
         path: 'groups',
         name: 'AssistantGroups',
-        component: () => import('@/views/shared/components/Groups.vue'),
+        component: () => import('@/components/Groups.vue'),
         meta: { title: 'Gestión de Grupos' }
       }
     ]

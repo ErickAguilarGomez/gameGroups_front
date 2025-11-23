@@ -325,7 +325,7 @@ import type {
   AllGroupsResponse,
 } from "@/interfaces/groups.interface";
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
-import UserDetailModal from "@/views/ceo/components/groups/UserDetailModal.vue";
+import UserDetailModal from "@/components/UserDetailModal.vue";
 import ProfileEditModal from "@/views/user/components/ProfileEditModal.vue";
 import { groups } from "@/api/backendApi";
 import BanUserModal from "@/views/ceo/components/groups/BanUserModal.vue";
