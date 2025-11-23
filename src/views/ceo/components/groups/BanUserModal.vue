@@ -24,9 +24,9 @@
           v-model="banReason"
           placeholder="Explica el motivo del baneo..."
           rows="4"
-          :state="banReason.trim().length > 0 ? true : false"
+          :state="isBanReasonValid"
         />
-        <BFormInvalidFeedback :state="banReason.trim().length > 0">
+        <BFormInvalidFeedback :state="isBanReasonValid">
           El motivo del baneo es obligatorio
         </BFormInvalidFeedback>
       </BFormGroup>
@@ -40,7 +40,7 @@
         <BButton 
           variant="danger" 
           @click="handleBan"
-          :disabled="banReason.trim().length === 0"
+          :disabled="!isBanReasonValid"
         >
           <IconBan :size="20" />
           Banear Usuario
@@ -54,40 +54,31 @@
 import { ref, computed, watch } from 'vue'
 import { BModal, BButton, BFormGroup, BFormTextarea, BFormInvalidFeedback } from 'bootstrap-vue-next'
 import { IconAlertTriangle, IconBan } from '@tabler/icons-vue'
+import type { BanUserModalProps, BanUserModalEmits } from '@/views/ceo/interfaces/ban-user.interface'
 
-interface User {
-  id: number
-  name: string
-  email: string
-}
+//PROPS AND EMITS
+const props = defineProps<BanUserModalProps>()
+const emit = defineEmits<BanUserModalEmits>()
 
-interface Props {
-  modelValue: boolean
-  user: User | null
-  groupId: number | null
-}
-
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'ban', data: { userId: number, groupId: number, banReason: string }): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
+//DATA
 const banReason = ref('')
+
+//COMPUTED
+const isBanReasonValid = computed(() => banReason.value.trim().length > 0)
 
 const isVisible = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
 })
 
+//WATCHERS
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
     banReason.value = ''
   }
 })
 
+//METHODS
 const handleClose = () => {
   emit('update:modelValue', false)
   banReason.value = ''

@@ -5,12 +5,8 @@
         <!-- Tabs Modernos -->
         <div class="mb-4">
           <div class="modern-tabs">
-            <button
-              v-for="tab in tabs"
-              :key="tab.key"
-              :class="['tab-item', { active: selectedTab === tab.tabNumber }]"
-              @click="selectedTab = tab.tabNumber"
-            >
+            <button v-for="tab in tabs" :key="tab.key" :class="['tab-item', { active: selectedTab === tab.tabNumber }]"
+              @click="selectedTab = tab.tabNumber">
               <component :is="tab.icon" :size="20" />
               <span class="tab-label">{{ tab.name }}</span>
               <span v-if="stats[tab.key] > 0" class="tab-badge">
@@ -24,29 +20,16 @@
         <BRow class="mb-3">
           <BCol md="6" class="ms-auto">
             <BInputGroup>
-              <BFormInput
-                v-model="searchQuery"
-                placeholder="Buscar por nombre o email..."
-              />
+              <BFormInput v-model="searchQuery" placeholder="Buscar por nombre o email..." />
               <BInputGroupText>
-                <IconSearch :size="18"
-                style="cursor: pointer;"
-                @click="onSearch"
-                />
+                <IconSearch :size="18" style="cursor: pointer;" @click="fetchUsers" />
               </BInputGroupText>
             </BInputGroup>
           </BCol>
         </BRow>
 
         <!-- Table -->
-        <BTable
-          :items="users"
-          :fields="userTableFields"
-          :busy="isBusy"
-          hover
-          responsive
-          striped
-        >
+        <BTable :items="users" :fields="userTableFields" :busy="isBusy" hover responsive striped>
           <template #table-busy>
             <div class="text-center my-2">
               <BSpinner class="align-middle"></BSpinner>
@@ -56,13 +39,8 @@
 
           <template #cell(name)="data">
             <div class="d-flex align-items-center">
-              <ImagePreview
-                :src="data.item.photo_url || undefined"
-                :alt="data.item.name"
-                :initial="data.item.name.charAt(0).toUpperCase()"
-                :size="40"
-                class="me-2"
-              />
+              <ImagePreview :src="data.item.photo_url || undefined" :alt="data.item.name"
+                :initial="data.item.name.charAt(0).toUpperCase()" :size="40" class="me-2" />
               <div>
                 <div class="fw-bold">{{ data.item.name }}</div>
                 <small class="text-muted">{{ data.item.email }}</small>
@@ -76,13 +54,8 @@
 
           <template #cell(social_network)="data">
             <div v-if="data.item.social_network" class="d-flex align-items-center justify-content-center gap-2">
-              <img 
-                :src="data.item.social_network.logo_url" 
-                :alt="data.item.social_network.name"
-                class="social-network-icon"
-                v-b-tooltip.hover
-                :title="data.item.social_network.name"
-              />
+              <img :src="data.item.social_network.logo_url" :alt="data.item.social_network.name"
+                class="social-network-icon" v-b-tooltip.hover :title="data.item.social_network.name" />
               <span class="social-nickname">{{ data.item.nickname }}</span>
             </div>
             <span v-else class="text-muted small">-</span>
@@ -90,25 +63,17 @@
 
           <template #cell(photo_status)="data">
             <div class="d-flex align-items-center justify-content-center gap-1">
-              <component 
-                :is="getPhotoStatusIcon(data.item.photo_status)"
-                :size="18"
-                :class="'text-' + getPhotoStatusVariant(data.item.photo_status)"
-                v-b-tooltip.hover
-                :title="getPhotoStatusText(data.item.photo_status)"
-              />
+              <component :is="getPhotoStatusIcon(data.item.photo_status)" :size="18"
+                :class="'text-' + getPhotoStatusVariant(data.item.photo_status)" v-b-tooltip.hover
+                :title="getPhotoStatusText(data.item.photo_status)" />
             </div>
           </template>
 
           <template #cell(account_status)="data">
             <div class="d-flex align-items-center justify-content-center gap-1">
-              <component
-                :is="getAccountStatusIcon(data.item.account_status)"
-                :size="18"
-                :class="'text-' + getAccountStatusVariant(data.item.account_status)"
-                v-b-tooltip.hover
-                :title="getAccountStatusText(data.item.account_status)"
-              />
+              <component :is="getAccountStatusIcon(data.item.account_status)" :size="18"
+                :class="'text-' + getAccountStatusVariant(data.item.account_status)" v-b-tooltip.hover
+                :title="getAccountStatusText(data.item.account_status)" />
             </div>
           </template>
 
@@ -120,24 +85,12 @@
             <!-- Acciones para tab 1: Usuarios Activos -->
             <template v-if="selectedTab === 1">
               <div class="d-flex gap-2 justify-content-center">
-                <BButton 
-                  variant="outline-primary" 
-                  size="sm" 
-                  @click="editUser(data.item)"
-                  v-b-tooltip.hover
-                  title="Editar usuario"
-                  class="icon-btn"
-                >
+                <BButton variant="outline-primary" size="sm" @click="editUser(data.item)" v-b-tooltip.hover
+                  title="Editar usuario" class="icon-btn">
                   <IconEdit :size="16" />
                 </BButton>
-                <BButton
-                  variant="outline-danger"
-                  size="sm"
-                  @click="deleteUser(data.item)"
-                  v-b-tooltip.hover
-                  title="Eliminar usuario"
-                  class="icon-btn"
-                >
+                <BButton variant="outline-danger" size="sm" @click="deleteUser(data.item)" v-b-tooltip.hover
+                  title="Eliminar usuario" class="icon-btn">
                   <IconTrash :size="16" />
                 </BButton>
               </div>
@@ -146,29 +99,15 @@
             <!-- Acciones para tab 2: Fotos Pendientes -->
             <template v-if="selectedTab === 2">
               <div class="d-flex gap-2 justify-content-center">
-                <BButton
-                  v-if="
-                    data.item.photo_status === 'pending' ||
-                    data.item.photo_status === 'rejected'
-                  "
-                  variant="outline-success"
-                  size="sm"
-                  @click="approvePhoto(data.item)"
-                  v-b-tooltip.hover
-                  title="Aprobar foto"
-                  class="icon-btn"
-                >
+                <BButton v-if="
+                  data.item.photo_status === 'pending' ||
+                  data.item.photo_status === 'rejected'
+                " variant="outline-success" size="sm" @click="approvePhoto(data.item)" v-b-tooltip.hover
+                  title="Aprobar foto" class="icon-btn">
                   <IconCircleCheck :size="16" />
                 </BButton>
-                <BButton
-                  v-if="data.item.photo_status === 'pending'"
-                  variant="outline-danger"
-                  size="sm"
-                  @click="rejectPhoto(data.item)"
-                  v-b-tooltip.hover
-                  title="Rechazar foto"
-                  class="icon-btn"
-                >
+                <BButton v-if="data.item.photo_status === 'pending'" variant="outline-danger" size="sm"
+                  @click="rejectPhoto(data.item)" v-b-tooltip.hover title="Rechazar foto" class="icon-btn">
                   <IconCircleX :size="16" />
                 </BButton>
               </div>
@@ -177,24 +116,12 @@
             <!-- Acciones para tab 3: Usuarios Rechazados -->
             <template v-if="selectedTab === 3">
               <div class="d-flex gap-2 justify-content-center">
-                <BButton
-                  variant="outline-success"
-                  size="sm"
-                  @click="approveUser(data.item)"
-                  v-b-tooltip.hover
-                  title="Aprobar usuario"
-                  class="icon-btn"
-                >
+                <BButton variant="outline-success" size="sm" @click="approveUser(data.item)" v-b-tooltip.hover
+                  title="Aprobar usuario" class="icon-btn">
                   <IconCircleCheck :size="16" />
                 </BButton>
-                <BButton
-                  variant="outline-danger"
-                  size="sm"
-                  @click="deleteUser(data.item)"
-                  v-b-tooltip.hover
-                  title="Eliminar usuario"
-                  class="icon-btn"
-                >
+                <BButton variant="outline-danger" size="sm" @click="deleteUser(data.item)" v-b-tooltip.hover
+                  title="Eliminar usuario" class="icon-btn">
                   <IconTrash :size="16" />
                 </BButton>
               </div>
@@ -205,60 +132,30 @@
               <!-- Si NO tiene foto, solo mostrar Aprobar y Rechazar -->
               <template v-if="!data.item.photo_url">
                 <div class="d-flex gap-2 justify-content-center">
-                  <BButton
-                    variant="outline-success"
-                    size="sm"
-                    @click="approveUserWithoutPhoto(data.item)"
-                    v-b-tooltip.hover
-                    title="Aprobar usuario"
-                    class="icon-btn"
-                  >
+                  <BButton variant="outline-success" size="sm" @click="approveUserWithoutPhoto(data.item)"
+                    v-b-tooltip.hover title="Aprobar usuario" class="icon-btn">
                     <IconCircleCheck :size="16" />
                   </BButton>
-                  <BButton
-                    variant="outline-danger"
-                    size="sm"
-                    @click="rejectUser(data.item)"
-                    v-b-tooltip.hover
-                    title="Rechazar usuario"
-                    class="icon-btn"
-                  >
+                  <BButton variant="outline-danger" size="sm" @click="rejectUser(data.item)" v-b-tooltip.hover
+                    title="Rechazar usuario" class="icon-btn">
                     <IconUserX :size="16" />
                   </BButton>
                 </div>
               </template>
-              
+
               <!-- Si tiene foto, mostrar todas las opciones -->
               <template v-else>
                 <div class="d-flex gap-2 justify-content-center">
-                  <BButton
-                    variant="outline-success"
-                    size="sm"
-                    @click="approveUserWithPhoto(data.item)"
-                    v-b-tooltip.hover
-                    title="Aprobar con foto"
-                    class="icon-btn"
-                  >
+                  <BButton variant="outline-success" size="sm" @click="approveUserWithPhoto(data.item)"
+                    v-b-tooltip.hover title="Aprobar con foto" class="icon-btn">
                     <IconCircleCheck :size="16" />
                   </BButton>
-                  <BButton
-                    variant="outline-warning"
-                    size="sm"
-                    @click="approveUserWithoutPhoto(data.item)"
-                    v-b-tooltip.hover
-                    title="Aprobar sin foto"
-                    class="icon-btn"
-                  >
+                  <BButton variant="outline-warning" size="sm" @click="approveUserWithoutPhoto(data.item)"
+                    v-b-tooltip.hover title="Aprobar sin foto" class="icon-btn">
                     <IconUserCheck :size="16" />
                   </BButton>
-                  <BButton
-                    variant="outline-danger"
-                    size="sm"
-                    @click="rejectUser(data.item)"
-                    v-b-tooltip.hover
-                    title="Rechazar usuario"
-                    class="icon-btn"
-                  >
+                  <BButton variant="outline-danger" size="sm" @click="rejectUser(data.item)" v-b-tooltip.hover
+                    title="Rechazar usuario" class="icon-btn">
                     <IconUserX :size="16" />
                   </BButton>
                 </div>
@@ -276,43 +173,27 @@
         <!-- Paginación -->
         <div v-if="totalRows > perPage" class="d-flex justify-content-between align-items-center mt-4">
           <div class="pagination-info">
-            Mostrando {{ (currentPage - 1) * perPage + 1 }} - {{ Math.min(currentPage * perPage, totalRows) }} de {{ totalRows }} usuarios
+            Mostrando {{ (currentPage - 1) * perPage + 1 }} - {{ Math.min(currentPage * perPage, totalRows) }} de {{
+              totalRows
+            }} usuarios
           </div>
-          <BPagination
-            v-model="currentPage"
-            :total-rows="totalRows"
-            :per-page="perPage"
-            @update:modelValue="handlePageChange"
-            align="end"
-            size="sm"
-            class="mb-0"
-          />
+          <BPagination v-model="currentPage" :total-rows="totalRows" :per-page="perPage"
+            @update:modelValue="handlePageChange" align="end" size="sm" class="mb-0" />
         </div>
       </BCardBody>
     </BCard>
 
     <!-- Modals -->
-    <EditUserModal
-      v-model="showEditModal"
-      :user="selectedUser"
-      @refresh="handleRefresh"
-    />
+    <EditUserModal v-model="showEditModal" :user="selectedUser" @refresh="handleRefresh" />
 
-    <RejectPhotoModal
-      v-model="showRejectPhotoModal"
-      :user="selectedUser"
-      @refresh="handleRefresh"
-    />
+    <RejectPhotoModal v-model="showRejectPhotoModal" :user="selectedUser" @refresh="handleRefresh" />
 
-    <RejectAccountModal
-      v-model="showRejectAccountModal"
-      :user="selectedUser"
-      @refresh="handleRefresh"
-    />
+    <RejectAccountModal v-model="showRejectAccountModal" :user="selectedUser" @refresh="handleRefresh" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
 import { userTableFields } from "@/views/ceo/data/table.fields";
 import { ceoUserService } from "@/views/ceo/services/userService";
 import EditUserModal from "@/views/ceo/components/users/EditUserModal.vue";
@@ -320,6 +201,8 @@ import RejectPhotoModal from "@/views/ceo/components/users/RejectPhotoModal.vue"
 import RejectAccountModal from "@/views/ceo/components/users/RejectAccountModal.vue";
 import type { User } from "@/interfaces";
 import ImagePreview from '@/components/ImagePreview.vue';
+import { useAlert } from '@/composables/useAlert';
+import { addPreloader, removePreloader } from '@/composables/usePreloader';
 
 const { toast, confirmDelete, confirm } = useAlert();
 
@@ -385,13 +268,12 @@ const fetchUsers = async () => {
       per_page: perPage.value,
       page: currentPage.value
     });
-    
-    // La respuesta ya viene con la estructura correcta del backend
+
     users.value = response.data || [];
     totalRows.value = response.total || 0;
     currentPage.value = response.current_page || 1;
     lastPage.value = response.last_page || 1;
-    
+
     return users.value;
   } catch (error) {
     console.error("Error al cargar usuarios:", error);
@@ -517,10 +399,6 @@ const handleRefresh = async () => {
   await updateStats();
 };
 
-const onSearch = () => {
-  fetchUsers();
-};
-
 const getPhotoStatusVariant = (status: string | null) => {
   switch (status) {
     case "approved":
@@ -599,7 +477,7 @@ const getAccountStatusText = (status: string) => {
   }
 };
 
-const formatDate = (date: string | null) => {
+const formatDate = (date: any) => {
   if (!date) return 'N/A';
   return new Date(date).toLocaleDateString("es-ES", {
     year: "numeric",
@@ -636,7 +514,7 @@ onMounted(async () => {
 });
 
 watch(selectedTab, (oldValue, newValue) => {
-  if(oldValue !== newValue){
+  if (oldValue !== newValue) {
     searchQuery.value = "";
     currentPage.value = 1;
     fetchUsers();

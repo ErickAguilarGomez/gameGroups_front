@@ -19,7 +19,7 @@ export default [
       {
         path: 'groups',
         name: 'CeoGroups',
-        component: () => import('@/views/ceo/components/Groups.vue'),
+        component: () => import('@/views/shared/components/Groups.vue'),
         meta: { title: 'Gestión de Grupos' }
       }
     ]

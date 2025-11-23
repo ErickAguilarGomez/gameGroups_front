@@ -30,10 +30,12 @@ declare module 'vue' {
     BSpinner: typeof import('bootstrap-vue-next/components/BSpinner')['BSpinner']
     BTable: typeof import('bootstrap-vue-next/components/BTable')['BTable']
     GamerSidebar: typeof import('./src/components/GamerSidebar.vue')['default']
+    GroupCard: typeof import('./src/components/GroupCard.vue')['default']
     ImagePreview: typeof import('./src/components/ImagePreview.vue')['default']
     Preloader: typeof import('./src/components/Preloader.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    UserGrid: typeof import('./src/components/UserGrid.vue')['default']
   }
   export interface GlobalDirectives {
     vBTooltip: typeof import('bootstrap-vue-next/directives/BTooltip')['vBTooltip']

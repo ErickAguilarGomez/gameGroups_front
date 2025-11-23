@@ -9,22 +9,24 @@
     header-text-variant="light"
     @hidden="handleClose"
   >
-    <div v-if="user" class="user-detail-container">
+    <div v-if="userDetail" class="user-detail-container">
       <!-- Avatar Section -->
       <div class="avatar-section">
         <div class="avatar-wrapper">
-          <img 
-            v-if="user.photo_url && user.photo_status === 'approved'" 
-            :src="user.photo_url" 
-            :alt="user.name"
+          <img
+            v-if="
+              userDetail.photo_url && userDetail.photo_status === 'approved'
+            "
+            :src="userDetail.photo_url"
+            :alt="userDetail.name"
             class="user-avatar"
           />
           <div v-else class="avatar-placeholder">
             <IconUser :size="64" />
           </div>
         </div>
-        <h4 class="user-name">{{ user.name }}</h4>
-        <p class="user-email">{{ user.email }}</p>
+        <h4 class="user-name">{{ userDetail.name }}</h4>
+        <p class="user-email">{{ userDetail.email }}</p>
       </div>
 
       <!-- Info Grid -->
@@ -36,7 +38,9 @@
           </div>
           <div class="info-content">
             <span class="info-label">Fecha de Nacimiento</span>
-            <span class="info-value">{{ formatDate(user.birthdate) || 'No especificada' }}</span>
+            <span class="info-value">{{
+              formatDate(userDetail.birthdate) || "No especificada"
+            }}</span>
           </div>
         </div>
 
@@ -47,13 +51,13 @@
           </div>
           <div class="info-content">
             <span class="info-label">Red Social</span>
-            <div v-if="user.social_network" class="social-info">
-              <img 
-                :src="user.social_network.logo_url" 
-                :alt="user.social_network.name"
+            <div v-if="userDetail.social_network_name && userDetail.logo_url" class="social-info">
+              <img
+                :src="userDetail.logo_url"
+                :alt="userDetail.social_network_name"
                 class="social-logo"
               />
-              <span class="info-value">{{ user.nickname || '-' }}</span>
+              <span class="info-value">{{ userDetail.nickname || "-" }}</span>
             </div>
             <span v-else class="info-value">No especificada</span>
           </div>
@@ -66,112 +70,96 @@
           </div>
           <div class="info-content">
             <span class="info-label">Fecha de Registro</span>
-            <span class="info-value">{{ formatDate(user.created_at) }}</span>
+            <span class="info-value">{{
+              formatDate(userDetail.created_at)
+            }}</span>
           </div>
         </div>
-
-        <!-- Account Status -->
+        <!-- Country -->
         <div class="info-card">
           <div class="info-icon">
-            <IconShieldCheck :size="24" />
+            <IconGlobe :size="24" />
           </div>
           <div class="info-content">
-            <span class="info-label">Estado de Cuenta</span>
-            <span :class="['info-value', 'status-badge', user.account_status]">
-              {{ getStatusLabel(user.account_status) }}
-            </span>
+            <span class="info-label">País</span>
+            <span class="info-value">{{ userDetail.country || "-" }}</span>
           </div>
         </div>
       </div>
 
       <!-- Ban Info (if banned) -->
-      <div v-if="user.banned_at" class="ban-section">
+      <div v-if="userDetail?.banned_at" class="ban-section">
         <div class="ban-header">
           <IconAlertTriangle :size="24" class="ban-icon" />
           <h5 class="ban-title">Usuario Baneado</h5>
         </div>
         <div class="ban-content">
-          <p class="ban-reason">{{ user.ban_reason || 'Sin motivo especificado' }}</p>
-          <p class="ban-date">Baneado el: {{ formatDate(user.banned_at) }}</p>
+          <p class="ban-reason">
+            {{ userDetail?.ban_reason || "Sin motivo especificado" }}
+          </p>
+          <p class="ban-date">
+            Baneado el: {{ formatDate(userDetail?.banned_at) }}
+          </p>
         </div>
-      </div>
-
-      <!-- Close Button -->
-      <div class="modal-footer-custom">
-        <button class="btn-close-custom" @click="handleClose">
-          <IconX :size="20" />
-          Cerrar
-        </button>
       </div>
     </div>
   </BModal>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from "vue";
+import { groupService } from "@/services/group.service";
+import { addPreloader, removePreloader } from "@/composables/usePreloader";
+import type { User, UserDetailModalProps, UserDetailModalEmits } from "@/interfaces/groups.interface";
+const { showUserDetail } = groupService;
 
-interface SocialNetwork {
-  id: number
-  name: string
-  logo_url: string
-}
+//DATA
+const userDetail = ref<User | null>(null);
 
-interface User {
-  id: number
-  name: string
-  email: string
-  photo_url?: string | null
-  photo_status?: string
-  nickname?: string | null
-  birthdate?: string | null
-  created_at?: string
-  account_status: string
-  social_network?: SocialNetwork | null
-  banned_at?: string | null
-  ban_reason?: string | null
-  banned_by?: number | null
-}
+//PROPS
+const props = defineProps<UserDetailModalProps>();
+const emit = defineEmits<UserDetailModalEmits>();
 
-interface Props {
-  modelValue: boolean
-  user: User | null
-}
-
-interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
+//COMPUTEDS
 const isVisible = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
+  set: (value) => emit("update:modelValue", value),
+});
 
+//MOUNTED
+onMounted(() => {
+  getUserDetail();
+});
+
+
+//METHODS
 const handleClose = () => {
-  emit('update:modelValue', false)
-}
+  isVisible.value = false;
+  emit("close");
+};
+
+const getUserDetail = async () => {
+  try {
+    addPreloader();
+    const response = await showUserDetail(props.user?.id as number);
+    userDetail.value = response as User;
+  } catch (error) {
+    console.log(error);
+  } finally {
+    removePreloader();
+  }
+};
 
 const formatDate = (date: string | null | undefined) => {
-  if (!date) return 'No disponible'
-  
-  const d = new Date(date)
-  return d.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-}
+  if (!date) return "No disponible";
+  const d = new Date(date);
+  return d.toLocaleDateString("es-ES", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
 
-const getStatusLabel = (status: string) => {
-  const labels: Record<string, string> = {
-    approved: 'Aprobado',
-    pending: 'Pendiente',
-    rejected: 'Rechazado'
-  }
-  return labels[status] || status
-}
 </script>
 
 <style scoped>
