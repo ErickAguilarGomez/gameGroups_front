@@ -4,16 +4,12 @@
       <BCardBody class="gamer-card-body">
         <!-- Tabs Modernos -->
         <div class="mb-4">
-          <div class="modern-tabs">
-            <button v-for="tab in tabs" :key="tab.key" :class="['tab-item', { active: selectedTab === tab.tabNumber }]"
-              @click="selectedTab = tab.tabNumber">
-              <component :is="tab.icon" :size="20" />
-              <span class="tab-label">{{ tab.name }}</span>
-              <span v-if="stats[tab.key] > 0" class="tab-badge">
-                {{ stats[tab.key] }}
-              </span>
-            </button>
-          </div>
+          <ModernTabs
+            :tabs="tabs"
+            :selected-tab="selectedTab"
+            :stats="stats"
+            @update:selected-tab="selectedTab = $event"
+          />
         </div>
 
         <!-- Search -->
@@ -83,7 +79,7 @@
 
           <template #cell(actions)="data">
             <!-- Acciones para tab 1: Usuarios Activos -->
-            <template v-if="selectedTab === 1">
+            <template v-if="selectedTab === 'activeUsers'">
               <div class="d-flex gap-2 justify-content-center">
                 <BButton variant="outline-primary" size="sm" @click="editUser(data.item)" v-b-tooltip.hover
                   title="Editar usuario" class="icon-btn">
@@ -97,7 +93,7 @@
             </template>
 
             <!-- Acciones para tab 2: Fotos Pendientes -->
-            <template v-if="selectedTab === 2">
+            <template v-if="selectedTab === 'pendingPhotos'">
               <div class="d-flex gap-2 justify-content-center">
                 <BButton v-if="
                   data.item.photo_status === 'pending' ||
@@ -114,7 +110,7 @@
             </template>
 
             <!-- Acciones para tab 3: Usuarios Rechazados -->
-            <template v-if="selectedTab === 3">
+            <template v-if="selectedTab === 'rejectedUsers'">
               <div class="d-flex gap-2 justify-content-center">
                 <BButton variant="outline-success" size="sm" @click="approveUser(data.item)" v-b-tooltip.hover
                   title="Aprobar usuario" class="icon-btn">
@@ -128,7 +124,7 @@
             </template>
 
             <!-- Acciones para tab 4: Pendientes de Aprobación -->
-            <template v-if="selectedTab === 4">
+            <template v-if="selectedTab === 'pendingApproval'">
               <!-- Si NO tiene foto, solo mostrar Aprobar y Rechazar -->
               <template v-if="!data.item.photo_url">
                 <div class="d-flex gap-2 justify-content-center">
@@ -199,6 +195,7 @@ import { assistantUserService } from "@/views/assistant/services/userService";
 import EditUserModal from "@/views/assistant/components/users/EditUserModal.vue";
 import RejectPhotoModal from "@/views/assistant/components/users/RejectPhotoModal.vue";
 import RejectAccountModal from "@/views/assistant/components/users/RejectAccountModal.vue";
+import ModernTabs from '@/components/ModernTabs.vue';
 import type { User } from "@/interfaces";
 import ImagePreview from '@/components/ImagePreview.vue';
 import { useAlert } from '@/composables/useAlert';
@@ -206,7 +203,7 @@ import { addPreloader, removePreloader } from '@/composables/usePreloader';
 
 const { toast, confirmDelete, confirm } = useAlert();
 
-const selectedTab = ref<number>(1);
+const selectedTab = ref<string>("activeUsers");
 const isBusy = ref(false);
 const users = ref<User[]>([]);
 const searchQuery = ref("");
@@ -224,31 +221,27 @@ const lastPage = ref(1);
 const tabs = [
   {
     key: "activeUsers" as const,
-    name: "Usuarios Activos",
+    label: "Usuarios Activos",
+    value: 1,
     icon: "IconUsers",
-    variant: "primary" as const,
-    tabNumber: 1,
   },
   {
     key: "pendingPhotos" as const,
-    name: "Fotos Pendientes",
+    label: "Fotos Pendientes",
+    value: 2,
     icon: "IconPhoto",
-    variant: "warning" as const,
-    tabNumber: 2,
   },
   {
     key: "rejectedUsers" as const,
-    name: "Usuarios Rechazados",
+    label: "Usuarios Rechazados",
+    value: 3,
     icon: "IconUserX",
-    variant: "danger" as const,
-    tabNumber: 3,
   },
   {
     key: "pendingApproval" as const,
-    name: "Pendientes de Aprobacion",
+    label: "Pendientes de Aprobacion",
+    value: 4,
     icon: "IconUserCheck",
-    variant: "info" as const,
-    tabNumber: 4,
   },
 ];
 const stats = ref({
@@ -262,8 +255,10 @@ const fetchUsers = async () => {
   if (isBusy.value) return;
   isBusy.value = true;
   try {
+    // Mapear key a número para la API
+    const tabNumber = tabs.find(t => t.key === selectedTab.value)?.value || 1;
     const response = await assistantUserService.getUsersByTab({
-      tab: selectedTab.value,
+      tab: tabNumber,
       search: searchQuery.value,
       per_page: perPage.value,
       page: currentPage.value

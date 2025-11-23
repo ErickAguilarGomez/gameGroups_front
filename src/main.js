@@ -11,8 +11,26 @@ import "flatpickr/dist/flatpickr.css";
 
 import { createBootstrap } from "bootstrap-vue-next";
 
+// VeeValidate
+import { configure, defineRule } from 'vee-validate';
+import { all } from '@vee-validate/rules';
+
+// Definir todas las reglas globales
+Object.entries(all).forEach(([name, rule]) => {
+  defineRule(name, rule);
+});
+
+// Configurar VeeValidate
+configure({
+  validateOnBlur: true,
+  validateOnChange: true,
+  validateOnInput: false,
+  validateOnModelUpdate: true,
+});
+
 const app = createApp(App);
 const pinia = createPinia();
+
 app.config.globalProperties.$alert = useAlert();
 app.use(createBootstrap());
 app.use(pinia);

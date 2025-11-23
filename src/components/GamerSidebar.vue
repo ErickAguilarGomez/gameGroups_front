@@ -11,7 +11,7 @@
       </button>
     </div>
 
-    <nav class="sidebar-nav">
+  <nav class="sidebar-nav">
       <div v-for="(section, index) in menuItems" :key="index" class="nav-section">
         <h3 v-if="section.title && !isCollapsed" class="section-title">
           {{ section.title }}
@@ -30,9 +30,11 @@
           </span>
         </router-link>
       </div>
+
+      <AnnouncementSection :is-collapsed="isCollapsed" />
     </nav>
 
-    <div class="sidebar-footer">
+      <div class="sidebar-footer">
       <button @click="handleLogout" class="logout-btn">
         <IconLogout :size="20" />
         <span v-if="!isCollapsed">Cerrar Sesión</span>
@@ -43,6 +45,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import AnnouncementSection from '@/components/AnnouncementSection.vue'
 
 interface MenuItem {
   name: string

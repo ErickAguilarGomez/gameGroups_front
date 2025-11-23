@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@tabler/icons-vue": "^3.35.0",
+    "@vee-validate/rules": "^4.15.1",
     "@vuepic/vue-datepicker": "^12.0.5",
     "@vueuse/core": "^14.0.0",
     "axios": "^1.13.2",
@@ -23,6 +24,7 @@
     "lucide-vue-next": "^0.554.0",
     "pinia": "^3.0.4",
     "sweetalert2": "^11.26.3",
+    "vee-validate": "^4.15.1",
     "vue": "^3.5.22",
     "vue-flatpickr-component": "^12.0.0",
     "vue-router": "^4.6.3",

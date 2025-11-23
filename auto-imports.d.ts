@@ -70,6 +70,7 @@ declare global {
   const triggerRef: typeof import('vue').triggerRef
   const unref: typeof import('vue').unref
   const useAlert: typeof import('./src/composables/useAlert').useAlert
+  const useAnnouncementStore: typeof import('./src/stores/announcement').useAnnouncementStore
   const useAppStore: typeof import('./src/stores/appStore').useAppStore
   const useAttrs: typeof import('vue').useAttrs
   const useAuth: typeof import('./src/composables/useAuth').useAuth
@@ -165,6 +166,7 @@ declare module 'vue' {
     readonly triggerRef: UnwrapRef<typeof import('vue')['triggerRef']>
     readonly unref: UnwrapRef<typeof import('vue')['unref']>
     readonly useAlert: UnwrapRef<typeof import('./src/composables/useAlert')['useAlert']>
+    readonly useAnnouncementStore: UnwrapRef<typeof import('./src/stores/announcement')['useAnnouncementStore']>
     readonly useAppStore: UnwrapRef<typeof import('./src/stores/appStore')['useAppStore']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
     readonly useAuth: UnwrapRef<typeof import('./src/composables/useAuth')['useAuth']>
