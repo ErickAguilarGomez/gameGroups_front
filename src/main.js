@@ -8,12 +8,13 @@ import { useAlert } from "./composables/useAlert";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 import "flatpickr/dist/flatpickr.css";
+import "./assets/css/gamer-styles.css";
 
 import { createBootstrap } from "bootstrap-vue-next";
 
 // VeeValidate
-import { configure, defineRule } from 'vee-validate';
-import { all } from '@vee-validate/rules';
+import { configure, defineRule } from "vee-validate";
+import { all } from "@vee-validate/rules";
 
 // Definir todas las reglas globales
 Object.entries(all).forEach(([name, rule]) => {

@@ -108,10 +108,6 @@ async function submit() {
     toast(err?.message || 'Error al guardar grupo', 'error')
   }
 }
-
-function cancel() {
-  visible.value = false
-}
 </script>
 
 <style scoped>

@@ -19,6 +19,8 @@ export interface User {
   created_at: string;
   nickname: string | null;
   social_network_id: number | null;
+  country?: string | null;
+  country_slug?: string | null;
   banned_at?: string | null;
   ban_reason?: string | null;
   banned_by?: number | null;

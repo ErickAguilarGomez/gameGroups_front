@@ -36,6 +36,7 @@ declare module 'vue' {
     BSpinner: typeof import('bootstrap-vue-next/components/BSpinner')['BSpinner']
     BTable: typeof import('bootstrap-vue-next/components/BTable')['BTable']
     copy: typeof import('./src/components/GamerSidebar copy.vue')['default']
+    CountrySelect: typeof import('./src/components/CountrySelect.vue')['default']
     GamerSidebar: typeof import('./src/components/GamerSidebar.vue')['default']
     GroupCard: typeof import('./src/components/GroupCard.vue')['default']
     GroupFormModal: typeof import('./src/components/GroupFormModal.vue')['default']

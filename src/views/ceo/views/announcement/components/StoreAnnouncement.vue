@@ -1,7 +1,7 @@
 <template>
   <div class="store-announcement">
     <BCard no-body class="gamer-card">
-      <BCardHeader class="gamer-card-header">
+      <BCardHeader v-if="!isEditMode" class="gamer-card-header">
         <div class="d-flex align-items-center">
           <IconPlus :size="24" class="me-2 text-primary" />
           <h4 class="gamer-title mb-0">Crear Nuevo Anuncio</h4>
@@ -33,17 +33,6 @@
                     </BFormInvalidFeedback>
                   </template>
                 </Field>
-                <div
-                  v-if="isEditMode && originalUrl && !form.is_video"
-                  class="mt-2"
-                >
-                  <small class="text-muted"
-                    >Imagen actual:
-                    <a :href="originalUrl" target="_blank" rel="noopener"
-                      >Ver</a
-                    ></small
-                  >
-                </div>
               </BCol>
             </BRow>
 
@@ -245,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, PropType, nextTick } from "vue";
+import { ref, watch, computed, PropType, nextTick } from "vue";
 import ImageUploader from "@/components/ImageUploader.vue";
 import flatPickr from "vue-flatpickr-component";
 import { Spanish } from "flatpickr/dist/l10n/es";
@@ -255,7 +244,7 @@ import { announcementService } from "@/views/ceo/services/announcement";
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
 import { useAnnouncementStore } from "@/stores/announcement";
 import { useAuthStore } from "@/stores/authStore";
-import { uploadToCloudinary } from '@/services/cloudinaryService'
+import { uploadToCloudinary } from "@/services/cloudinaryService";
 
 // Props and Emits
 const props = defineProps({
@@ -314,11 +303,6 @@ const imageFieldRules = computed(() => () => {
 });
 
 //MOUNTED
-onMounted(() => {
-  if (props.id) {
-    void fetchAnnouncementById(props.id);
-  }
-});
 
 async function fetchAnnouncementById(id?: number | null) {
   if (!id) return;
@@ -336,8 +320,8 @@ async function fetchAnnouncementById(id?: number | null) {
       title: data.title || "",
       description: data.description || "",
       url: data.url || "",
-      start_date: startDateVal || "",
-      end_date: endDateVal || "",
+      start_date: startDateVal ? formatDateForPicker(startDateVal) : "",
+      end_date: endDateVal ? formatDateForPicker(endDateVal) : "",
       is_active: data.is_active !== undefined ? data.is_active : true,
       is_video:
         data.is_video !== undefined ? Boolean(data.is_video) : !!isVideoUrl,
@@ -446,6 +430,15 @@ const parseDate = (val: string | null | undefined) => {
   return isNaN(d.getTime()) ? null : d;
 };
 
+const formatDateForPicker = (date: Date) => {
+  const pad = (n: number) => (n < 10 ? "0" + n : "" + n);
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
 const resetForm = async () => {
   form.value = {
@@ -583,13 +576,23 @@ watch(
     }
   }
 );
+watch(
+  () => props.id,
+  (newId) => {
+    if (newId) {
+      void fetchAnnouncementById(newId);
+    } else {
+      resetForm();
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>
 .store-announcement {
-  padding: 2rem;
+  padding: 0;
   background: #0f0f23;
-  min-height: 100vh;
 }
 
 .gamer-card {
@@ -617,7 +620,7 @@ watch(
 
 .gamer-card-body {
   background: #0f0f23;
-  padding: 1.5rem;
+  padding: 1rem;
 }
 
 .field-label {

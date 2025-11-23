@@ -1,13 +1,14 @@
 <template>
   <div class="user-groups-gamer">
     <!-- Header con perfil (solo para usuarios normales) -->
-    <div v-if="!canModerate && currentUser.role_id!==3" class="header-container">
-      <div class="header-content">
-        <h1 class="page-title">
-          <IconUsersGroup :size="32" />
-          Grupos
-        </h1>
-      </div>
+    <div
+      v-if="!canModerate && currentUser.role_id !== 3"
+      class="header-container d-flex justify-content-between align-items-center my-3"
+    >
+      <h1 class="page-title text-white">
+        <IconUsersGroup :size="32" />
+        Grupos
+      </h1>
       <!-- Profile Button -->
       <div class="profile-section">
         <div class="profile-avatar" @click="showProfileModal = true">
@@ -33,21 +34,21 @@
     </div>
 
     <!-- Header Admin -->
-    <div v-else-if="currentUser.role_id!==3" class="header-container my-2">
+    <div v-else-if="currentUser.role_id !== 3" class="header-container my-2">
       <div class="header-content">
         <h1 class="page-title">
           <IconUsersGroup :size="32" />
           Gestión de Grupos
         </h1>
-      
-      <BButton
-        variant="primary"
-        class="btn-create-group ms-auto align-self-start"
-        @click="openCreateModal"
-      >
-        <IconPlus :size="20" />
-        <span>Crear Grupo</span>
-      </BButton>
+
+        <BButton
+          variant="primary"
+          class="btn-create-group ms-auto align-self-start"
+          @click="openCreateModal"
+        >
+          <IconPlus :size="20" />
+          <span>Crear Grupo</span>
+        </BButton>
       </div>
     </div>
 
@@ -296,7 +297,11 @@
     />
 
     <!-- Modal Crear/Editar Grupo -->
-  <GroupFormModal v-model="showCreateModal" :initialGroup="editingGroup" @saved="getAllGroups" />
+    <GroupFormModal
+      v-model="showCreateModal"
+      :initialGroup="editingGroup"
+      @saved="getAllGroups"
+    />
 
     <!-- Ban User Modal -->
     <BanUserModal
@@ -321,7 +326,7 @@ import type {
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
 import UserDetailModal from "@/components/UserDetailModal.vue";
 import ProfileEditModal from "@/views/user/components/ProfileEditModal.vue";
-import GroupFormModal from '@/components/GroupFormModal.vue'
+import GroupFormModal from "@/components/GroupFormModal.vue";
 import { groups } from "@/api/backendApi";
 import BanUserModal from "@/views/ceo/components/groups/BanUserModal.vue";
 import { useAlert } from "@/composables/useAlert";
@@ -501,9 +506,9 @@ function editGroup(group: Group) {
 }
 
 function openCreateModal() {
-  editingGroup.value = null
-  groupForm.value = { name: '', group_img_url: '' }
-  showCreateModal.value = true
+  editingGroup.value = null;
+  groupForm.value = { name: "", group_img_url: "" };
+  showCreateModal.value = true;
 }
 
 async function deleteGroup(groupId: number) {
