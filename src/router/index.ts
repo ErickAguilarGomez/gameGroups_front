@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 // Importar rutas de módulos
 import ceoRoutes from '@/views/ceo/routes/index'
 import userRoutes from '@/views/user/routes/index'
+import assistantRoutes from '@/views/assistant/routes/index'
 
 const routes = [
   {
@@ -25,6 +26,9 @@ const routes = [
   
   // Rutas de CEO (Admin)
   ...ceoRoutes,
+  
+  // Rutas de Assistant
+  ...assistantRoutes,
   
   // Rutas de Usuario
   ...userRoutes,
@@ -50,7 +54,7 @@ router.beforeEach(async (to, _from, next) => {
   if (to.name === 'Login' || to.name === 'Register') {
     // Si ya está autenticado en el store, redirigir
     if (authStore.isAuthenticated) {
-      const redirectRoute = authStore.isAdmin || authStore.isAssistant ? 'CeoUsers' : 'UserGroups'
+      const redirectRoute = authStore.isAdmin ? 'CeoUsers' : authStore.isAssistant ? 'AssistantUsers' : 'UserGroups'
       return next({ name: redirectRoute })
     }
     
@@ -60,7 +64,7 @@ router.beforeEach(async (to, _from, next) => {
     
     // Después de verificar con el backend, si está autenticado, redirigir
     if (authStore.isAuthenticated) {
-      const redirectRoute = authStore.isAdmin || authStore.isAssistant ? 'CeoUsers' : 'UserGroups'
+      const redirectRoute = authStore.isAdmin ? 'CeoUsers' : authStore.isAssistant ? 'AssistantUsers' : 'UserGroups'
       return next({ name: redirectRoute })
     }
     
@@ -82,6 +86,10 @@ router.beforeEach(async (to, _from, next) => {
     
     // Verificar permisos por rol
     if (to.meta.requiresAdmin && !authStore.isAdminOrAssistant) {
+      return next({ name: 'UserGroups' })
+    }
+    
+    if (to.meta.requiresAssistant && !authStore.isAssistant) {
       return next({ name: 'UserGroups' })
     }
     

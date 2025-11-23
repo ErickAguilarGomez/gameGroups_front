@@ -1,7 +1,7 @@
 <template>
   <div class="user-groups-gamer">
     <!-- Header con perfil (solo para usuarios normales) -->
-    <div v-if="!canModerate" class="header-container">
+    <div v-if="!canModerate && currentUser.role_id!==3" class="header-container">
       <div class="header-content">
         <h1 class="page-title">
           <IconUsersGroup :size="32" />
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Header Admin -->
-    <div v-else class="header-container">
+    <div v-else-if="currentUser.role_id!==3" class="header-container">
       <div class="header-content">
         <h1 class="page-title">
           <IconUsersGroup :size="32" />
