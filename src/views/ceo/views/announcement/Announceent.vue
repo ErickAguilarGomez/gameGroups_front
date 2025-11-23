@@ -63,7 +63,12 @@ onMounted(() => {
 const getAnnouncements = async () => {
   try {
     addPreloader();
-    const response = await announcementService.getAnnouncements();
+    const params = {
+      page: 1,
+      per_page: 10,
+      status:selectedTab.value
+    };
+    const response = await announcementService.getAnnouncements(params);
     console.log('Anuncios obtenidos:', response.data);
   } catch (error) {
     console.error('Error al obtener los anuncios:', error);

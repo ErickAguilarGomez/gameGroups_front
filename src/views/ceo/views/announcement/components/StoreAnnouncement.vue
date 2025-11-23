@@ -9,7 +9,7 @@
       </BCardHeader>
 
       <BCardBody class="gamer-card-body">
-  <Form ref="formRef" @submit="handleSubmit" class="announcement-form">
+        <Form ref="formRef" @submit="handleSubmit" class="announcement-form">
           <fieldset
             :disabled="isSubmitting || uploading"
             style="border: 0; padding: 0; margin: 0"
@@ -90,7 +90,6 @@
                     </BFormInvalidFeedback>
                   </template>
                 </Field>
-                <small class="text-muted">Fecha y hora de inicio</small>
               </BCol>
 
               <BCol md="3">
@@ -112,7 +111,6 @@
                     </BFormInvalidFeedback>
                   </template>
                 </Field>
-                <small class="text-muted">Fecha y hora de fin</small>
               </BCol>
 
               <BCol md="6" class="d-flex align-items-center">
@@ -165,33 +163,23 @@
                   :rules="imageFieldRules"
                   name="image"
                 >
-                  <template #default="{ field, errorMessage }">
-                    <input
-                      ref="fileInputNativeRef"
-                      id="image"
-                      type="file"
-                      :name="field.name"
-                      accept="image/*"
-                      class="d-none"
-                      @change="(e: Event) => { handleImageChange(e); field.onChange?.(e); }"
-                    />
+                  <template #default="{ errorMessage }">
                     <div class="d-flex align-items-center gap-2">
-                      <div v-if="selectedImagePreview || originalUrl" class="image-preview position-relative">
-                        <img :src="selectedImagePreview || originalUrl || undefined" alt="Preview" class="preview-image" />
-                        <div class="image-actions position-absolute top-0 end-0 m-2 d-flex gap-1">
-                          <BButton variant="light" size="sm" class="p-1 rounded-circle" @click="triggerFileInputNative" :disabled="isSubmitting || uploading">
-                            <IconUpload :size="16" />
-                          </BButton>
-                          <BButton variant="light" size="sm" class="p-1 rounded-circle" @click="removeSelectedImage">
-                            <IconTrash :size="16" />
-                          </BButton>
-                        </div>
-                      </div>
-                      <div v-if="!(selectedImagePreview || originalUrl)" class="d-flex gap-2 align-items-center">
-                        <BButton variant="light" size="sm" class="p-1 rounded-circle" @click="triggerFileInputNative" :disabled="isSubmitting || uploading">
-                          <IconUpload :size="16" />
-                        </BButton>
-                      </div>
+                      <ImageUploader
+                        :initial-preview="selectedImagePreview || originalUrl"
+                        :disabled="isSubmitting || uploading"
+                        @update:file="
+                          (f) => {
+                            form.image = f;
+                          }
+                        "
+                        @update:preview="
+                          (p) => {
+                            selectedImagePreview = p;
+                            if (p) originalUrl = null;
+                          }
+                        "
+                      />
                     </div>
                     <BFormInvalidFeedback v-if="errorMessage">
                       {{ errorMessage }}
@@ -258,15 +246,16 @@
 
 <script setup lang="ts">
 import { ref, watch, computed, onMounted, PropType, nextTick } from "vue";
+import ImageUploader from "@/components/ImageUploader.vue";
 import flatPickr from "vue-flatpickr-component";
 import { Spanish } from "flatpickr/dist/l10n/es";
 import { Form, Field } from "vee-validate";
 import { useAlert } from "@/composables/useAlert";
 import { announcementService } from "@/views/ceo/services/announcement";
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
-import { useAnnouncementStore } from '@/stores/announcement'
+import { useAnnouncementStore } from "@/stores/announcement";
 import { useAuthStore } from "@/stores/authStore";
-import { cloudinary } from "@/api/backendApi";
+import { uploadToCloudinary } from '@/services/cloudinaryService'
 
 // Props and Emits
 const props = defineProps({
@@ -300,7 +289,6 @@ const dateTimeConfigEnd = ref({
   minDate: new Date(),
 });
 
-
 //DATA
 const isSubmitting = ref(false);
 const uploading = ref(false);
@@ -316,16 +304,21 @@ const form = ref({
 });
 const originalUrl = ref<string | null>(null);
 const selectedImagePreview = ref<string | null>(null);
+
+//Computed
 const isEditMode = computed(() => !!props.id);
-  // image preview handled in `selectedImagePreview`
-const imageFieldRules = computed(() =>
-      () => {
-        // If it's a video, no image required; if editing and existing image -> optional; otherwise required
-        if (form.value.is_video) return 'image';
-        if (isEditMode.value && originalUrl.value) return 'image';
-        return 'required|image';
-      }
-);
+const imageFieldRules = computed(() => () => {
+  if (form.value.is_video) return "image";
+  if (isEditMode.value && originalUrl.value) return "image";
+  return "required|image";
+});
+
+//MOUNTED
+onMounted(() => {
+  if (props.id) {
+    void fetchAnnouncementById(props.id);
+  }
+});
 
 async function fetchAnnouncementById(id?: number | null) {
   if (!id) return;
@@ -336,8 +329,8 @@ async function fetchAnnouncementById(id?: number | null) {
       .toString()
       .match(/youtube|vimeo|youtu\.be|vimeo\.com/i);
 
-  const startDateVal = parseDate(data.start_date);
-  const endDateVal = parseDate(data.end_date);
+    const startDateVal = parseDate(data.start_date);
+    const endDateVal = parseDate(data.end_date);
 
     form.value = {
       title: data.title || "",
@@ -346,11 +339,12 @@ async function fetchAnnouncementById(id?: number | null) {
       start_date: startDateVal || "",
       end_date: endDateVal || "",
       is_active: data.is_active !== undefined ? data.is_active : true,
-      is_video: data.is_video !== undefined ? Boolean(data.is_video) : !!isVideoUrl,
+      is_video:
+        data.is_video !== undefined ? Boolean(data.is_video) : !!isVideoUrl,
       image: null,
     };
-  originalUrl.value = form.value.is_video ? null : (data.url || null);
-  selectedImagePreview.value = originalUrl.value;
+    originalUrl.value = form.value.is_video ? null : data.url || null;
+    selectedImagePreview.value = originalUrl.value;
     if (startDateVal) {
       dateTimeConfigEnd.value.minDate = startDateVal;
     }
@@ -380,12 +374,6 @@ async function fetchAnnouncementById(id?: number | null) {
   }
 }
 
-onMounted(() => {
-  if (props.id) {
-    void fetchAnnouncementById(props.id);
-  }
-});
-
 const startDateRules = (value: unknown) => {
   const v = value as string | Date | null;
   if (!v) return "La fecha de inicio es requerida";
@@ -412,37 +400,33 @@ const endDateRules = (value: unknown) => {
   return true;
 };
 
-//METHODS
-
-const handleImageChange = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0] || null;
+function updateFile(file: File | null) {
   form.value.image = file;
-  if (file) {
+  if (previousObjectUrl) {
     try {
-      if (previousObjectUrl) {
-        URL.revokeObjectURL(previousObjectUrl);
-      }
+      URL.revokeObjectURL(previousObjectUrl);
     } catch (e) {}
+    previousObjectUrl = null;
+  }
+  if (file) {
     const url = URL.createObjectURL(file);
     selectedImagePreview.value = url;
     previousObjectUrl = url;
+    originalUrl.value = null;
+  } else {
+    selectedImagePreview.value = null;
   }
-};
-
-function triggerFileInputNative() {
-  fileInputNativeRef.value?.click();
 }
 
-function removeSelectedImage() {
-  form.value.image = null;
-  if (fileInputNativeRef.value) fileInputNativeRef.value.value = '';
-  if (previousObjectUrl) {
-    try { URL.revokeObjectURL(previousObjectUrl); } catch (e) {}
+function updatePreview(preview: string | null) {
+  if (previousObjectUrl && preview !== previousObjectUrl) {
+    try {
+      URL.revokeObjectURL(previousObjectUrl);
+    } catch (e) {}
     previousObjectUrl = null;
   }
-  selectedImagePreview.value = null;
-  originalUrl.value = null;
+  selectedImagePreview.value = preview;
+  if (preview) originalUrl.value = null;
 }
 
 function formatAsBackendDate(date: Date) {
@@ -461,69 +445,7 @@ const parseDate = (val: string | null | undefined) => {
   const d = new Date(iso);
   return isNaN(d.getTime()) ? null : d;
 };
-//WATCHERS
-watch(
-  () => form.value.start_date,
-  (newStart) => {
-    if (newStart) {
-      const d = new Date(newStart);
-      if (!isNaN(d.getTime())) {
-        dateTimeConfigEnd.value.minDate = d;
-      }
-    } else {
-      dateTimeConfigEnd.value.minDate = new Date();
-    }
-  }
-);
 
-// When switching to video, clear image fields
-watch(() => form.value.is_video, (isVideo) => {
-  if (isVideo) {
-    form.value.image = null;
-    if (fileInputNativeRef.value) fileInputNativeRef.value.value = '';
-    if (previousObjectUrl) {
-      try { URL.revokeObjectURL(previousObjectUrl); } catch (e) {}
-      previousObjectUrl = null;
-    }
-    selectedImagePreview.value = null;
-    originalUrl.value = null;
-  }
-});
-
-async function uploadToCloudinary(file: File): Promise<string> {
-  uploading.value = true;
-
-  try {
-    const signatureResponse = await cloudinary.getSignature("announcements");
-    const { signature, timestamp, api_key, cloud_name, folder } =
-      signatureResponse.data;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("api_key", api_key);
-    formData.append("timestamp", timestamp.toString());
-    formData.append("signature", signature);
-    formData.append("folder", folder);
-
-    const response = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Error al subir la imagen");
-    }
-    const data = await response.json();
-    return data.secure_url;
-  } catch (error: any) {
-    console.error("Cloudinary upload error:", error);
-    throw new Error(error.message || "Error al subir la imagen a Cloudinary");
-  } finally {
-    uploading.value = false;
-  }
-}
 
 const resetForm = async () => {
   form.value = {
@@ -538,7 +460,9 @@ const resetForm = async () => {
   };
   fileInputKey.value++;
   if (previousObjectUrl) {
-    try { URL.revokeObjectURL(previousObjectUrl); } catch (e) {}
+    try {
+      URL.revokeObjectURL(previousObjectUrl);
+    } catch (e) {}
     previousObjectUrl = null;
   }
   selectedImagePreview.value = null;
@@ -552,16 +476,14 @@ const handleSubmit = async () => {
 
   try {
     let finalUrl = "";
-
-    // Ensure either video URL or image exists
     if (!form.value.is_video && !originalUrl.value && !form.value.image) {
-      toast('Debes subir una imagen o seleccionar un video', 'error');
+      toast("Debes subir una imagen o seleccionar un video", "error");
       isSubmitting.value = false;
       removePreloader();
       return;
     }
     if (form.value.is_video && !form.value.url) {
-      toast('Debes ingresar la URL del video', 'error');
+      toast("Debes ingresar la URL del video", "error");
       isSubmitting.value = false;
       removePreloader();
       return;
@@ -571,12 +493,16 @@ const handleSubmit = async () => {
       finalUrl = form.value.url;
     } else {
       if (form.value.image && (form.value.image as File) instanceof File) {
-        finalUrl = await uploadToCloudinary(form.value.image as File);
+        uploading.value = true;
+        try {
+          finalUrl = await uploadToCloudinary(form.value.image as File);
+        } finally {
+          uploading.value = false;
+        }
       } else {
         finalUrl = originalUrl.value || "";
       }
     }
-
     const announcementData: any = {
       title: form.value.title,
       description: form.value.description || "",
@@ -592,19 +518,23 @@ const handleSubmit = async () => {
       url: finalUrl,
     };
 
-  // prepare payload
-  announcementData.is_video = form.value.is_video ? 1 : 0;
+    // prepare payload
+    announcementData.is_video = form.value.is_video ? 1 : 0;
     if (isEditMode.value && props.id) {
       announcementData.id = props.id;
       await announcementService.updateAnnouncement(announcementData);
       toast("Anuncio actualizado exitosamente", "success");
       // refresh central announcements store so other UI updates automatically
-      try { await useAnnouncementStore().fetchAnnouncements(); } catch(e){}
+      try {
+        await useAnnouncementStore().fetchAnnouncements();
+      } catch (e) {}
       emit("refresh");
     } else {
       await announcementService.createAnnouncement(announcementData);
       toast("Anuncio creado exitosamente", "success");
-      try { await useAnnouncementStore().fetchAnnouncements(); } catch(e){}
+      try {
+        await useAnnouncementStore().fetchAnnouncements();
+      } catch (e) {}
     }
     await resetForm();
   } catch (error: any) {
@@ -618,6 +548,41 @@ const handleSubmit = async () => {
     removePreloader();
   }
 };
+
+defineExpose({ updateFile, updatePreview });
+
+//WATCHERS
+watch(
+  () => form.value.start_date,
+  (newStart) => {
+    if (newStart) {
+      const d = new Date(newStart);
+      if (!isNaN(d.getTime())) {
+        dateTimeConfigEnd.value.minDate = d;
+      }
+    } else {
+      dateTimeConfigEnd.value.minDate = new Date();
+    }
+  }
+);
+
+watch(
+  () => form.value.is_video,
+  (isVideo) => {
+    if (isVideo) {
+      form.value.image = null;
+      if (fileInputNativeRef.value) fileInputNativeRef.value.value = "";
+      if (previousObjectUrl) {
+        try {
+          URL.revokeObjectURL(previousObjectUrl);
+        } catch (e) {}
+        previousObjectUrl = null;
+      }
+      selectedImagePreview.value = null;
+      originalUrl.value = null;
+    }
+  }
+);
 </script>
 
 <style scoped>

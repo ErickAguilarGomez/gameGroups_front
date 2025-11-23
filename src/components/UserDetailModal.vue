@@ -78,7 +78,13 @@
         <!-- Country -->
         <div class="info-card">
           <div class="info-icon">
-            <IconGlobe :size="24" />
+            <img
+              v-if="userDetail.country_slug"
+              :src="flagUrl(userDetail.country_slug)"
+              :alt="userDetail.country || 'Bandera'"
+              class="country-flag"
+            />
+            <IconGlobe v-else :size="24" />
           </div>
           <div class="info-content">
             <span class="info-label">País</span>
@@ -159,6 +165,12 @@ const formatDate = (date: string | null | undefined) => {
     day: "numeric",
   });
 };
+
+function flagUrl(slug?: string | null) {
+  if (!slug) return ''
+  const code = slug.toString().slice(0, 2).toLowerCase()
+  return `https://flagcdn.com/w40/${code}.png`
+}
 
 </script>
 
@@ -269,6 +281,14 @@ const formatDate = (date: string | null | undefined) => {
   font-size: 0.9375rem;
   font-weight: 600;
   color: #18181b;
+}
+
+.country-flag {
+  width: 28px;
+  height: 20px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.06);
 }
 
 .social-info {

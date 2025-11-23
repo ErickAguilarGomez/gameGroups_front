@@ -153,6 +153,28 @@
                   </b-form-text>
                 </b-form-group>
 
+                <!-- País (Opcional) -->
+                <b-form-group label="País (Opcional)" label-for="country" class="mb-3">
+                  <b-input-group>
+                    <template #prepend>
+                      <b-input-group-text>
+                        <IconGlobe :size="20" />
+                      </b-input-group-text>
+                    </template>
+                    <b-form-input
+                      id="country"
+                      v-model="form.country"
+                      list="countriesList"
+                      placeholder="Buscar o seleccionar tu país (opcional)"
+                      @input="onCountryInput"
+                    />
+                    <datalist id="countriesList">
+                      <option v-for="c in countries" :key="c.slug" :value="c.name">{{ c.flag ? c.flag + ' ' : '' }}{{ c.name }}</option>
+                    </datalist>
+                  </b-input-group>
+                  <b-form-text>Tu país es opcional y se enviará al backend si lo seleccionas</b-form-text>
+                </b-form-group>
+
                 <!-- Contraseña -->
                 <b-form-group label="Contraseña" label-for="password" class="mb-3">
                   <b-input-group>
@@ -245,7 +267,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth, cloudinary } from '@/api/backendApi'
 import flatPickr from 'vue-flatpickr-component'
@@ -258,6 +280,13 @@ interface SocialNetwork {
   logo_url: string
 }
 
+interface Country {
+  name: string
+  slug: string
+  code?: string
+  flag?: string
+}
+
 const router = useRouter()
 
 const form = ref({
@@ -268,9 +297,12 @@ const form = ref({
   birthdate: '',
   social_network_id: null as number | null,
   nickname: '',
+  country: null as string | null,
+  country_slug: null as string | null,
 })
 
 const socialNetworks = ref<SocialNetwork[]>([])
+const countries = ref<Country[]>([])
 const photoUrl = ref<string | null>(null)
 const fileInput = ref<HTMLInputElement | null>(null)
 const loading = ref(false)
@@ -288,7 +320,32 @@ const dateConfig = {
   allowInput: true
 }
 
-// Obtener redes sociales al montar el componente
+function slugify(text: string) {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+}
+
+function countryCodeToEmoji(code?: string) {
+  if (!code) return ''
+  return code.toUpperCase().split('').map(c => String.fromCodePoint(127397 + c.charCodeAt(0))).join('')
+}
+
+function normalizeText(text: string | null | undefined) {
+  if (!text) return ''
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .trim()
+}
+
 onMounted(async () => {
   try {
     const response = await backendApi.get('/api/social-networks')
@@ -296,6 +353,28 @@ onMounted(async () => {
   } catch (err) {
     console.error('Error al cargar redes sociales:', err)
   }
+
+  try {
+    const res = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2')
+    if (res.ok) {
+      const data = await res.json()
+      countries.value = data
+        .map((c: any) => ({
+          name: c?.name?.common ?? c?.name,
+          slug: (c?.cca2 ?? slugify(c?.name?.common ?? c?.name))?.toString(),
+          code: c?.cca2,
+          flag: countryCodeToEmoji(c?.cca2),
+        }))
+        .sort((a: Country, b: Country) => a.name.localeCompare(b.name))
+    }
+  } catch (err) {
+    console.error('Error al cargar países:', err)
+  }
+})
+
+watch(() => form.value.country_slug, (newSlug) => {
+  const selected = countries.value.find(c => c.slug === (newSlug as string))
+  form.value.country = selected ? selected.name : null
 })
 
 function selectSocialNetwork(id: number) {
@@ -315,6 +394,25 @@ function getSelectedSocialNetworkName() {
 
 function triggerFileInput() {
   fileInput.value?.click()
+}
+
+function onCountryInput(value: string) {
+  const name = value?.toString()?.trim() ?? ''
+  if (!name) {
+    form.value.country_slug = null
+    return
+  }
+  const found = countries.value.find(c => normalizeText(c.name) === normalizeText(name))
+  form.value.country_slug = found ? found.slug : null
+}
+
+function ensureCountrySlugFromName() {
+  if (form.value.country && !form.value.country_slug) {
+    const found = countries.value.find(c => normalizeText(c.name) === normalizeText(form.value.country as string))
+    if (found) {
+      form.value.country_slug = found.slug
+    }
+  }
 }
 
 async function handleFileSelect(event: Event) {
@@ -399,13 +497,14 @@ async function handleSubmit() {
 
   try {
     await auth.csrf()
+    // Resolve slug if user typed the country name manually
+    ensureCountrySlugFromName()
     
     const registerData: any = {
       ...form.value,
       photo_url: photoUrl.value || undefined,
     }
 
-    // Solo incluir social_network_id y nickname si se seleccionó una red social
     if (!form.value.social_network_id) {
       delete registerData.social_network_id
       delete registerData.nickname
@@ -415,7 +514,6 @@ async function handleSubmit() {
 
     success.value = '✅ Cuenta creada exitosamente. Tu solicitud está pendiente de aprobación por un administrador.'
     
-    // Limpiar formulario
     form.value = {
       name: '',
       email: '',
@@ -424,6 +522,8 @@ async function handleSubmit() {
       birthdate: '',
       social_network_id: null,
       nickname: '',
+      country: null,
+      country_slug: null,
     }
     photoUrl.value = null
 

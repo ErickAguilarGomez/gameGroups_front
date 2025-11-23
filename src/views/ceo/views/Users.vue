@@ -222,25 +222,21 @@ const tabs = [
   {
     key: "activeUsers" as const,
     label: "Usuarios Activos",
-    value: 1,
     icon: "IconUsers",
   },
   {
     key: "pendingPhotos" as const,
     label: "Fotos Pendientes",
-    value: 2,
     icon: "IconPhoto",
   },
   {
     key: "rejectedUsers" as const,
     label: "Usuarios Rechazados",
-    value: 3,
     icon: "IconUserX",
   },
   {
     key: "pendingApproval" as const,
     label: "Pendientes de Aprobacion",
-    value: 4,
     icon: "IconUserCheck",
   },
 ];
@@ -255,8 +251,8 @@ const fetchUsers = async () => {
   if (isBusy.value) return;
   isBusy.value = true;
   try {
-    // Mapear key a número para la API
-    const tabNumber = tabs.find(t => t.key === selectedTab.value)?.value || 1;
+    const tabIndex = tabs.findIndex(t => t.key === selectedTab.value);
+    const tabNumber: number = tabIndex >= 0 ? tabIndex + 1 : 1;
     const response = await ceoUserService.getUsersByTab({
       tab: tabNumber,
       search: searchQuery.value,

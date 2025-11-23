@@ -33,21 +33,22 @@
     </div>
 
     <!-- Header Admin -->
-    <div v-else-if="currentUser.role_id!==3" class="header-container">
+    <div v-else-if="currentUser.role_id!==3" class="header-container my-2">
       <div class="header-content">
         <h1 class="page-title">
           <IconUsersGroup :size="32" />
           Gestión de Grupos
         </h1>
-      </div>
+      
       <BButton
         variant="primary"
-        class="btn-create-group"
-        @click="showCreateModal = true"
+        class="btn-create-group ms-auto align-self-start"
+        @click="openCreateModal"
       >
         <IconPlus :size="20" />
         <span>Crear Grupo</span>
       </BButton>
+      </div>
     </div>
 
     <!-- Groups Grid -->
@@ -94,6 +95,13 @@
 
       <!-- Mi Grupo -->
       <div v-if="myGroup" class="group-card-gamer my-group-card">
+        <div
+          v-if="myGroup.group_img_url"
+          class="group-cover"
+          :class="{ 'cover-hidden': !coverVisible[myGroup.id] }"
+          :style="{ backgroundImage: `url(${myGroup.group_img_url})` }"
+          @click="handleCoverClick(myGroup)"
+        ></div>
         <div class="card-header-gamer">
           <div class="header-content">
             <div class="group-avatar">
@@ -139,6 +147,14 @@
         @dragover.prevent
         @drop="handleDrop(group.id)"
       >
+        <div
+          v-if="group.group_img_url"
+          class="group-cover"
+          :class="{ 'cover-hidden': !coverVisible[group.id] }"
+          :style="{ backgroundImage: `url(${group.group_img_url})` }"
+          @click="handleCoverClick(group)"
+        ></div>
+
         <div class="card-header-gamer">
           <div class="header-content">
             <div class="group-avatar">
@@ -280,29 +296,7 @@
     />
 
     <!-- Modal Crear/Editar Grupo -->
-    <BModal
-      v-model="showCreateModal"
-      :title="editingGroup ? 'Editar Grupo' : 'Crear Grupo'"
-      centered
-      header-bg-variant="dark"
-      header-text-variant="light"
-      no-footer
-    >
-      <BFormGroup label="Nombre del Grupo" label-for="group-name">
-        <BFormInput
-          id="group-name"
-          v-model="groupForm.name"
-          placeholder="Ej: Equipo Alpha"
-        />
-      </BFormGroup>
-
-      <div class="modal-footer-custom">
-        <BButton variant="primary" @click="saveGroup">
-          <IconDeviceFloppy :size="20" />
-          {{ editingGroup ? "Actualizar" : "Crear" }}
-        </BButton>
-      </div>
-    </BModal>
+  <GroupFormModal v-model="showCreateModal" :initialGroup="editingGroup" @saved="getAllGroups" />
 
     <!-- Ban User Modal -->
     <BanUserModal
@@ -316,7 +310,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, reactive } from "vue";
 import { useAuthStore } from "@/stores/authStore";
 import { groupService } from "@/services/group.service";
 import type {
@@ -327,6 +321,7 @@ import type {
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
 import UserDetailModal from "@/components/UserDetailModal.vue";
 import ProfileEditModal from "@/views/user/components/ProfileEditModal.vue";
+import GroupFormModal from '@/components/GroupFormModal.vue'
 import { groups } from "@/api/backendApi";
 import BanUserModal from "@/views/ceo/components/groups/BanUserModal.vue";
 import { useAlert } from "@/composables/useAlert";
@@ -336,6 +331,7 @@ const authStore = useAuthStore();
 const currentUser = computed(() => authStore.user as any);
 const groupsService = groupService;
 const groupsList = ref<Group[]>([]);
+const coverVisible = reactive<Record<number, boolean>>({});
 const usersWithoutGroup = ref<User[]>([]);
 const bannedUsers = ref<User[]>([]);
 const showUserDetail = ref(false);
@@ -348,6 +344,7 @@ const canModerate = computed(() => authStore.canModerate);
 const showCreateModal = ref(false);
 const editingGroup = ref<Group | null>(null);
 const groupForm = ref({ name: "", group_img_url: "" });
+// GroupFormModal is used in the template
 const draggedUser = ref<{ user: User; fromGroupId: number | null } | null>(
   null
 );
@@ -388,6 +385,10 @@ async function getAllGroups() {
       group_img_url: group.group_img_url || null,
       users: group.users,
     }));
+    Object.keys(coverVisible).forEach((k) => delete coverVisible[parseInt(k)]);
+    groupsList.value.forEach((g) => {
+      if (g && g.id) coverVisible[g.id] = Boolean(g.group_img_url);
+    });
   } catch (error) {
     groupsList.value = [];
     usersWithoutGroup.value = [];
@@ -395,6 +396,11 @@ async function getAllGroups() {
   } finally {
     removePreloader();
   }
+}
+
+function handleCoverClick(group: Group) {
+  if (!group?.id) return;
+  coverVisible[group.id] = false;
 }
 
 function openUserDetail(user: User) {
@@ -483,21 +489,7 @@ async function handleUnban(userId: number) {
   }
 }
 
-async function saveGroup() {
-  try {
-    if (editingGroup.value) {
-      await groups.update(editingGroup.value.id, groupForm.value);
-      toast("Grupo actualizado", "success");
-    } else {
-      await groups.create(groupForm.value);
-      toast("Grupo creado", "success");
-    }
-    closeModal();
-    getAllGroups();
-  } catch (error: any) {
-    toast("Error al guardar grupo", "error");
-  }
-}
+// saveGroup handled by GroupFormModal; parent listens for @saved to refresh list
 
 function editGroup(group: Group) {
   editingGroup.value = group;
@@ -506,6 +498,12 @@ function editGroup(group: Group) {
     group_img_url: group.group_img_url || "",
   };
   showCreateModal.value = true;
+}
+
+function openCreateModal() {
+  editingGroup.value = null
+  groupForm.value = { name: '', group_img_url: '' }
+  showCreateModal.value = true
 }
 
 async function deleteGroup(groupId: number) {
@@ -526,11 +524,7 @@ async function deleteGroup(groupId: number) {
   }
 }
 
-function closeModal() {
-  showCreateModal.value = false;
-  editingGroup.value = null;
-  groupForm.value = { name: "", group_img_url: "" };
-}
+// modal lifecycle is handled by GroupFormModal; parent only toggles showCreateModal
 </script>
 
 <style scoped>
@@ -540,39 +534,6 @@ function closeModal() {
   min-height: 100vh;
 }
 
-/* Header */
-.header-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  gap: 2rem;
-}
-
-.header-content {
-  flex: 1;
-}
-
-.page-title {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #00d9ff 0%, #7c3aed 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 0.5rem 0;
-}
-
-.page-subtitle {
-  color: #a1a1aa;
-  font-size: 0.9375rem;
-  margin: 0;
-}
-
-/* Profile Section */
 .profile-section {
   display: flex;
   align-items: center;
@@ -671,6 +632,8 @@ function closeModal() {
   padding: 1.5rem;
   transition: all 0.3s;
   min-height: 300px;
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -942,5 +905,20 @@ function closeModal() {
   margin: 0;
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+.group-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background-size: cover;
+  background-position: center;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+}
+
+.group-cover.cover-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 </style>
