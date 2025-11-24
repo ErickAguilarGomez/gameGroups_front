@@ -19,6 +19,8 @@ export interface User {
   created_at: string;
   nickname: string | null;
   social_network_id: number | null;
+  social_network_name?: string | null;
+  social_network_logo_url?: string | null;
   country?: string | null;
   country_slug?: string | null;
   banned_at?: string | null;
@@ -26,6 +28,8 @@ export interface User {
   banned_by?: number | null;
   last_seen?: string | null;
   group_id?: number | null;
+  group_name?: string | null;
+  group_img_url?: string | null;
   social_network?: SocialNetwork | null;
   group?: Group | null;
 }

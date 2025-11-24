@@ -10,6 +10,7 @@ export interface User {
   account_status?: string;
   created_at?: string;
   social_network_name?: string | null;
+  social_network_logo_url?: string | null;
   logo_url?: string | null;
   banned_at?: string | null;
   ban_reason?: string | null;

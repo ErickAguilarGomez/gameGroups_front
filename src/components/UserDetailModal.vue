@@ -51,9 +51,9 @@
           </div>
           <div class="info-content">
             <span class="info-label">Red Social</span>
-            <div v-if="userDetail.social_network_name && userDetail.logo_url" class="social-info">
+            <div v-if="userDetail.social_network_name && userDetail.social_network_logo_url" class="social-info">
               <img
-                :src="userDetail.logo_url"
+                :src="userDetail.social_network_logo_url"
                 :alt="userDetail.social_network_name"
                 class="social-logo"
               />

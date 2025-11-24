@@ -3,7 +3,7 @@ import backendApi from "@/api/backendApi";
 export const announcementService = {
   async getAnnouncements(params: object) {
     try {
-      const response = await backendApi.post('/api/announcements',params);
+      const response = await backendApi.post("/api/announcements", params);
       return response.data;
     } catch (error) {
       console.error("Error al obtener anuncios:", error);
@@ -13,7 +13,10 @@ export const announcementService = {
 
   async createAnnouncement(announcementData: FormData | object) {
     try {
-      const response = await backendApi.post('/api/announcements/store', announcementData);
+      const response = await backendApi.post(
+        "/api/announcements/store",
+        announcementData
+      );
       return response.data;
     } catch (error) {
       console.error("Error al crear anuncio:", error);
@@ -21,9 +24,12 @@ export const announcementService = {
     }
   },
 
-   async updateAnnouncement(announcementData: FormData | object) {
+  async updateAnnouncement(announcementData: FormData | object) {
     try {
-      const response = await backendApi.patch(`/api/announcements/update/`, announcementData);
+      const response = await backendApi.patch(
+        `/api/announcements/update`,
+        announcementData
+      );
       return response.data;
     } catch (error) {
       console.error("Error al actualizar anuncio:", error);
@@ -31,18 +37,20 @@ export const announcementService = {
     }
   },
 
-  async deleteAnnouncement(params: {id:number}) {
+  async deleteAnnouncement(params: { id: number }) {
     try {
- 
-      const response = await backendApi.post(`/api/announcements/destroy`, params);
+      const response = await backendApi.post(
+        `/api/announcements/destroy`,
+        params
+      );
       return response.data;
     } catch (error) {
       console.error("Error al eliminar anuncio:", error);
       throw error;
     }
   },
- 
-  async showAnnouncement(params: {id:number}) {
+
+  async showAnnouncement(params: { id: number }) {
     try {
       const response = await backendApi.post(`/api/announcements/show`, params);
       return response.data;
@@ -50,5 +58,5 @@ export const announcementService = {
       console.error("Error al mostrar anuncio:", error);
       throw error;
     }
-  }
-}
+  },
+};

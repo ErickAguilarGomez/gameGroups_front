@@ -49,9 +49,9 @@
           </template>
 
           <template #cell(social_network)="data">
-            <div v-if="data.item.social_network" class="d-flex align-items-center justify-content-center gap-2">
-              <img :src="data.item.social_network.logo_url" :alt="data.item.social_network.name"
-                class="social-network-icon" v-b-tooltip.hover :title="data.item.social_network.name" />
+            <div v-if="data.item.social_network_name && data.item.social_network_logo_url" class="d-flex align-items-center justify-content-center gap-2">
+              <img :src="data.item.social_network_logo_url" :alt="data.item.social_network_name"
+                class="social-network-icon" v-b-tooltip.hover :title="data.item.social_network_name" />
               <span class="social-nickname">{{ data.item.nickname }}</span>
             </div>
             <span v-else class="text-muted small">-</span>
