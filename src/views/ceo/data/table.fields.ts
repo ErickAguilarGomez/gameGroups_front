@@ -1,57 +1,115 @@
 export const userTableFields = [
-  { 
-    key: 'name', 
-    label: 'Usuario', 
+  {
+    key: "name",
+    label: "Usuario",
     sortable: true,
     visible: true,
-    thClass: 'text-start',
-    tdClass: 'text-start'
+    thClass: "text-start",
+    tdClass: "text-start",
   },
   {
-    key:"birthdate",
-    label:"Fecha Nacimiento",
-    sortable:true,
-    visible:true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
+    key: "birthdate",
+    label: "Fecha Nacimiento",
+    sortable: true,
+    visible: true,
+    thClass: "text-center",
+    tdClass: "text-center",
   },
   {
-    key: 'social_network',
-    label: 'Red Social',
+    key: "social_network",
+    label: "Red Social",
     sortable: false,
     visible: true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
+    thClass: "text-center",
+    tdClass: "text-center",
   },
-  { 
-    key: 'photo_status', 
-    label: 'Estado Foto', 
+  {
+    key: "photo_status",
+    label: "Estado Foto",
     sortable: true,
     visible: true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
+    thClass: "text-center",
+    tdClass: "text-center",
   },
-  { 
-    key: 'account_status', 
-    label: 'Estado Cuenta', 
+  {
+    key: "account_status",
+    label: "Estado Cuenta",
     sortable: true,
     visible: true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
+    thClass: "text-center",
+    tdClass: "text-center",
   },
-  { 
-    key: 'created_at', 
-    label: 'Fecha Registro', 
+  {
+    key: "created_at",
+    label: "Fecha Registro",
     sortable: true,
     visible: true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
+    thClass: "text-center",
+    tdClass: "text-center",
   },
-  { 
-    key: 'actions', 
-    label: 'Acciones',
+  {
+    key: "actions",
+    label: "Acciones",
     visible: true,
-    thClass: 'text-center',
-    tdClass: 'text-center'
-  }
-]
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+];
+
+export const announcementTableFields = [
+  {
+    key: "title",
+    label: "Título",
+    sortable: true,
+    visible: true,
+    thClass: "text-start",
+    tdClass: "text-start",
+  },
+  {
+    key: "description",
+    label: "Descripción",
+    sortable: false,
+    visible: true,
+    thClass: "text-start",
+    tdClass: "text-start",
+  },
+  {
+    key: "start_date",
+    label: "Fecha Inicio",
+    sortable: true,
+    visible: true,
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+  {
+    key: "end_date",
+    label: "Fecha Fin",
+    sortable: true,
+    visible: true,
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+  {
+    key: "created_at",
+    label: "Fecha Creación",
+    sortable: true,
+    visible: true,
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+  {
+    key: "deleted_at",
+    label: "Fecha Eliminación",
+    sortable: true,
+    visible: false,
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+  {
+    key: "actions",
+    label: "Acciones",
+    visible: true,
+    thClass: "text-center",
+    tdClass: "text-center",
+  },
+];

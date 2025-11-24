@@ -37,6 +37,12 @@ const menuItems = [
         label: 'Grupos',
         icon: 'IconUsersGroup',
         route: { name: 'CeoGroups' }
+      },
+      {
+        name: 'anuncios',
+        label: 'Anuncios',
+        icon: 'IconBell',
+        route: { name: 'CeoAnnouncement' }
       }
     ]
   }

@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { ceoUserService } from '@/views/ceo/services/userService'
-import type { User } from '@/types/user'
+import type { User } from '@/interfaces'
 import { useAlert } from '@/composables/useAlert'
 
 const { toast } = useAlert()

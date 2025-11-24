@@ -26,10 +26,10 @@
         <!-- Foto de perfil -->
         <div class="text-center mb-4">
           <div class="photo-preview mx-auto mb-3">
-            <img 
-              v-if="photoPreview" 
-              :src="photoPreview" 
-              alt="Preview" 
+            <img
+              v-if="photoPreview"
+              :src="photoPreview"
+              alt="Preview"
               class="preview-image"
             />
             <div v-else class="preview-placeholder">
@@ -45,18 +45,25 @@
             class="d-none"
           />
           <div class="d-flex gap-2 justify-content-center">
-            <BButton 
-              variant="outline-primary" 
+            <BButton
+              variant="outline-primary"
               size="sm"
-              @click="triggerFileInput" 
+              @click="triggerFileInput"
               :disabled="userStore.isUploading"
             >
               <BSpinner v-if="userStore.isUploading" small class="me-2" />
-              <IconUpload :size="18" class="me-1" v-if="!userStore.isUploading" />
-              {{ userStore.isUploading ? 'Subiendo...' : 'Seleccionar Foto' }}
+              <IconUpload
+                :size="18"
+                class="me-1"
+                v-if="!userStore.isUploading"
+              />
+              {{ userStore.isUploading ? "Subiendo..." : "Seleccionar Foto" }}
             </BButton>
             <BButton
-              v-if="photoPreview && photoPreview !== authStore.currentUser?.photo_url"
+              v-if="
+                photoPreview &&
+                photoPreview !== authStore.currentUser?.photo_url
+              "
               variant="outline-danger"
               size="sm"
               @click="removePhoto"
@@ -93,42 +100,48 @@
                 <IconMail :size="20" />
               </BInputGroupText>
             </template>
-            <BFormInput
-              id="email"
-              v-model="form.email"
-              type="email"
-              disabled
-            />
+            <BFormInput id="email" v-model="form.email" type="email" disabled />
           </BInputGroup>
           <BFormText>El correo electrónico no se puede modificar</BFormText>
         </BFormGroup>
 
         <!-- Fecha de nacimiento -->
-        <BFormGroup label="Fecha de Nacimiento" label-for="birthdate" class="mb-3">
+        <BFormGroup
+          label="Fecha de Nacimiento"
+          label-for="birthdate"
+          class="mb-3"
+        >
           <BInputGroup>
             <template #prepend>
               <BInputGroupText>
                 <IconCalendar :size="20" />
               </BInputGroupText>
             </template>
-            <BFormInput
-              id="birthdate"
-              v-model="form.birthdate"
-              type="date"
-            />
+            <BFormInput id="birthdate" v-model="form.birthdate" type="date" />
           </BInputGroup>
         </BFormGroup>
 
         <!-- Red Social -->
-        <BFormGroup label="Red Social (Opcional)" label-for="social_network" class="mb-3">
+        <BFormGroup
+          label="Red Social (Opcional)"
+          label-for="social_network"
+          class="mb-3"
+        >
           <div class="social-network-selector">
-            <div 
-              v-for="network in socialNetworks" 
+            <div
+              v-for="network in socialNetworks"
               :key="network.id"
-              :class="['social-option', { active: form.social_network_id === network.id }]"
+              :class="[
+                'social-option',
+                { active: form.social_network_id === network.id },
+              ]"
               @click="selectSocialNetwork(network.id)"
             >
-              <img :src="network.logo_url" :alt="network.name" class="social-icon" />
+              <img
+                :src="network.logo_url"
+                :alt="network.name"
+                class="social-icon"
+              />
               <span class="social-name">{{ network.name }}</span>
             </div>
           </div>
@@ -136,10 +149,10 @@
         </BFormGroup>
 
         <!-- Nickname (Solo si seleccionó red social) -->
-        <BFormGroup 
-          v-if="form.social_network_id" 
-          label="Nickname" 
-          label-for="nickname" 
+        <BFormGroup
+          v-if="form.social_network_id"
+          label="Nickname"
+          label-for="nickname"
           class="mb-3"
         >
           <BInputGroup>
@@ -161,8 +174,20 @@
           </BFormText>
         </BFormGroup>
 
+        <!-- País -->
+        <BFormGroup label="País" label-for="country" class="mb-3">
+          <CountrySelect
+            v-model="form.country"
+            v-model:modelSlug="form.country_slug"
+          />
+        </BFormGroup>
+
         <!-- Contraseña (Opcional) -->
-        <BFormGroup label="Nueva Contraseña (Opcional)" label-for="password" class="mb-3">
+        <BFormGroup
+          label="Nueva Contraseña (Opcional)"
+          label-for="password"
+          class="mb-3"
+        >
           <BInputGroup>
             <template #prepend>
               <BInputGroupText>
@@ -177,20 +202,25 @@
               minlength="8"
             />
             <template #append>
-              <BButton variant="outline-secondary" @click="showPassword = !showPassword">
+              <BButton
+                variant="outline-secondary"
+                @click="showPassword = !showPassword"
+              >
                 <IconEye v-if="!showPassword" :size="20" />
                 <IconEyeOff v-else :size="20" />
               </BButton>
             </template>
           </BInputGroup>
-          <BFormText>Mínimo 8 caracteres. Dejar vacío para mantener la actual</BFormText>
+          <BFormText
+            >Mínimo 8 caracteres. Dejar vacío para mantener la actual</BFormText
+          >
         </BFormGroup>
 
         <!-- Confirmar Contraseña -->
-        <BFormGroup 
-          v-if="form.password" 
-          label="Confirmar Nueva Contraseña" 
-          label-for="password_confirmation" 
+        <BFormGroup
+          v-if="form.password"
+          label="Confirmar Nueva Contraseña"
+          label-for="password_confirmation"
           class="mb-3"
         >
           <BInputGroup>
@@ -207,7 +237,10 @@
               minlength="8"
             />
             <template #append>
-              <BButton variant="outline-secondary" @click="showPasswordConfirm = !showPasswordConfirm">
+              <BButton
+                variant="outline-secondary"
+                @click="showPasswordConfirm = !showPasswordConfirm"
+              >
                 <IconEye v-if="!showPasswordConfirm" :size="20" />
                 <IconEyeOff v-else :size="20" />
               </BButton>
@@ -216,7 +249,14 @@
         </BFormGroup>
 
         <!-- Error Alert -->
-        <BAlert v-if="userStore.currentError" variant="danger" show dismissible @dismissed="userStore.clearError()" class="mb-3">
+        <BAlert
+          v-if="userStore.currentError"
+          variant="danger"
+          show
+          dismissible
+          @dismissed="userStore.clearError()"
+          class="mb-3"
+        >
           <IconAlertCircle :size="20" class="me-2" />
           {{ userStore.currentError }}
         </BAlert>
@@ -237,8 +277,12 @@
             :disabled="userStore.isLoading || userStore.isUploading"
           >
             <BSpinner v-if="userStore.isLoading" small class="me-2" />
-            <IconDeviceFloppy :size="20" class="me-2" v-if="!userStore.isLoading" />
-            {{ userStore.isLoading ? 'Guardando...' : 'Guardar Cambios' }}
+            <IconDeviceFloppy
+              :size="20"
+              class="me-2"
+              v-if="!userStore.isLoading"
+            />
+            {{ userStore.isLoading ? "Guardando..." : "Guardar Cambios" }}
           </BButton>
         </div>
       </BForm>
@@ -247,145 +291,159 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
-import { useUserStore } from '@/views/user/store/userStore'
-import { useAuthStore } from '@/stores'
-import backendApi from '@/api/backendApi'
-import type { SocialNetwork } from '@/interfaces/models'
+import { ref, watch, computed, onMounted } from "vue";
+import { useUserStore } from "@/views/user/store/userStore";
+import { useAuthStore } from "@/stores";
+import backendApi from "@/api/backendApi";
+import type { SocialNetwork } from "@/interfaces/models";
+import CountrySelect from "@/components/CountrySelect.vue";
 
 interface Props {
-  modelValue: boolean
+  modelValue: boolean;
 }
 
 interface Emits {
-  (e: 'update:modelValue', value: boolean): void
-  (e: 'updated'): void
+  (e: "update:modelValue", value: boolean): void;
+  (e: "updated"): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
-const userStore = useUserStore()
-const authStore = useAuthStore()
+const userStore = useUserStore();
+const authStore = useAuthStore();
 
 const isOpen = computed({
   get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
-})
+  set: (value) => emit("update:modelValue", value),
+});
 
 const form = ref({
-  name: '',
-  email: '',
+  name: "",
+  email: "",
   social_network_id: null as number | null,
-  nickname: '',
-  birthdate: '',
-  password: '',
-  password_confirmation: '',
-})
+  nickname: "",
+  birthdate: "",
+  country: null as string | null,
+  country_slug: null as string | null,
+  password: "",
+  password_confirmation: "",
+});
 
-const photoPreview = ref<string | null>(null)
-const uploadedPhotoUrl = ref<string | null>(null)
-const fileInput = ref<HTMLInputElement | null>(null)
-const socialNetworks = ref<SocialNetwork[]>([])
-const successMessage = ref<string | null>(null)
-const showPassword = ref(false)
-const showPasswordConfirm = ref(false)
+const photoPreview = ref<string | null>(null);
+const uploadedPhotoUrl = ref<string | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
+const socialNetworks = ref<SocialNetwork[]>([]);
+const successMessage = ref<string | null>(null);
+const showPassword = ref(false);
+const showPasswordConfirm = ref(false);
 
 onMounted(async () => {
-  await loadSocialNetworks()
-  loadUserData()
-})
+  await loadSocialNetworks();
+  loadUserData();
+});
 
 async function loadSocialNetworks() {
   try {
-    const response = await backendApi.get('/api/social-networks')
-    socialNetworks.value = response.data
+    const response = await backendApi.get("/api/social-networks");
+    socialNetworks.value = response.data;
   } catch (error) {
-    console.error('Error al cargar redes sociales:', error)
+    console.error("Error al cargar redes sociales:", error);
   }
 }
 
 function loadUserData() {
-  const user = authStore.currentUser
+  const user = authStore.currentUser;
   if (user) {
     form.value = {
-      name: user.name || '',
-      email: user.email || '',
+      name: user.name || "",
+      email: user.email || "",
       social_network_id: user.social_network_id || null,
-      nickname: user.nickname || '',
-      birthdate: user.birthdate ? user.birthdate.split('T')[0] : '',
-      password: '',
-      password_confirmation: '',
-    }
-    photoPreview.value = user.photo_url || null
-    uploadedPhotoUrl.value = null
+      nickname: user.nickname || "",
+      birthdate: user.birthdate ? user.birthdate.split("T")[0] : "",
+      country: user.country || null,
+      country_slug: user.country_slug || null,
+      password: "",
+      password_confirmation: "",
+    };
+    photoPreview.value = user.photo_url || null;
+    uploadedPhotoUrl.value = null;
   }
 }
 
-watch(() => authStore.currentUser, () => {
-  loadUserData()
-}, { immediate: true })
+watch(
+  () => authStore.currentUser,
+  () => {
+    loadUserData();
+  },
+  { immediate: true }
+);
 
 // Recargar datos cuando se abre el modal
-watch(() => props.modelValue, (newVal) => {
-  if (newVal) {
-    loadUserData()
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal) {
+      loadUserData();
+    }
   }
-})
+);
 
 function selectSocialNetwork(id: number) {
   if (form.value.social_network_id === id) {
-    form.value.social_network_id = null
-    form.value.nickname = ''
+    form.value.social_network_id = null;
+    form.value.nickname = "";
   } else {
-    form.value.social_network_id = id
+    form.value.social_network_id = id;
   }
 }
 
 function getSelectedSocialNetworkName() {
-  const selected = socialNetworks.value.find(n => n.id === form.value.social_network_id)
-  return selected?.name || 'la red social'
+  const selected = socialNetworks.value.find(
+    (n) => n.id === form.value.social_network_id
+  );
+  return selected?.name || "la red social";
 }
 
 function triggerFileInput() {
-  fileInput.value?.click()
+  fileInput.value?.click();
 }
 
 async function handleFileSelect(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  
-  if (!file) return
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
 
-  const url = await userStore.uploadPhoto(file)
-  
+  if (!file) return;
+
+  const url = await userStore.uploadPhoto(file);
+
   if (url) {
-    uploadedPhotoUrl.value = url
-    photoPreview.value = url
+    uploadedPhotoUrl.value = url;
+    photoPreview.value = url;
   }
 }
 
 function removePhoto() {
-  uploadedPhotoUrl.value = null
-  photoPreview.value = authStore.currentUser?.photo_url || null
+  uploadedPhotoUrl.value = null;
+  photoPreview.value = authStore.currentUser?.photo_url || null;
   if (fileInput.value) {
-    fileInput.value.value = ''
+    fileInput.value.value = "";
   }
 }
 
 async function saveProfile() {
-  successMessage.value = null
-  userStore.clearError()
+  successMessage.value = null;
+  userStore.clearError();
 
   // Validar contraseñas si se está cambiando
   if (form.value.password) {
     if (form.value.password.length < 8) {
-      userStore.error = 'La contraseña debe tener al menos 8 caracteres'
-      return
+      userStore.error = "La contraseña debe tener al menos 8 caracteres";
+      return;
     }
     if (form.value.password !== form.value.password_confirmation) {
-      userStore.error = 'Las contraseñas no coinciden'
-      return
+      userStore.error = "Las contraseñas no coinciden";
+      return;
     }
   }
 
@@ -395,44 +453,46 @@ async function saveProfile() {
       nickname: form.value.nickname || null,
       birthdate: form.value.birthdate || null,
       social_network_id: form.value.social_network_id,
-    }
+      country: form.value.country,
+      country_slug: form.value.country_slug,
+    };
 
     // Incluir foto si fue cargada
     if (uploadedPhotoUrl.value) {
-      updateData.photo_url = uploadedPhotoUrl.value
+      updateData.photo_url = uploadedPhotoUrl.value;
     }
 
     // Incluir contraseña si fue cambiada
     if (form.value.password) {
-      updateData.password = form.value.password
-      updateData.password_confirmation = form.value.password_confirmation
+      updateData.password = form.value.password;
+      updateData.password_confirmation = form.value.password_confirmation;
     }
 
-    const result = await userStore.updateProfile(updateData)
+    const result = await userStore.updateProfile(updateData);
 
     if (result.success) {
       // Recargar datos del usuario desde el backend
-      await authStore.fetchUser()
-      
-      successMessage.value = '✅ Perfil actualizado correctamente'
-      emit('updated')
-      
+      await authStore.fetchUser();
+
+      successMessage.value = "✅ Perfil actualizado correctamente";
+      emit("updated");
+
       setTimeout(() => {
-        isOpen.value = false
-      }, 1500)
+        isOpen.value = false;
+      }, 1500);
     }
   } catch (error) {
-    console.error('Error al actualizar perfil:', error)
+    console.error("Error al actualizar perfil:", error);
   }
 }
 
 function resetForm() {
-  photoPreview.value = authStore.currentUser?.photo_url || null
-  uploadedPhotoUrl.value = null
-  successMessage.value = null
-  userStore.clearError()
+  photoPreview.value = authStore.currentUser?.photo_url || null;
+  uploadedPhotoUrl.value = null;
+  successMessage.value = null;
+  userStore.clearError();
   if (fileInput.value) {
-    fileInput.value.value = ''
+    fileInput.value.value = "";
   }
 }
 </script>
@@ -570,7 +630,11 @@ function resetForm() {
 
 .social-option.active {
   border-color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1) 0%,
+    rgba(118, 75, 162, 0.1) 100%
+  );
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 

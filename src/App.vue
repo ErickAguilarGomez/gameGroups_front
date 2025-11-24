@@ -2,13 +2,19 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
+import { useAppStore } from '@/stores/appStore'
 import { authService } from '@/services/authService'
-import { BApp } from 'bootstrap-vue-next'
+import Preloader from '@/components/Preloader.vue'
 
 const authStore = useAuthStore()
+const appStore = useAppStore()
 const router = useRouter()
 
 onMounted(async () => {
+  const loadingBg = document.getElementById('loading-bg')
+  if (loadingBg) {
+    loadingBg.remove()
+  }
 
   try {
     await authService.getCsrfCookie()
@@ -25,9 +31,10 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <BApp>
+  <div>
+    <Preloader :show="appStore.loading" />
     <router-view />
-  </BApp>
+  </div>
 </template>
 
 <style>

@@ -1,4 +1,3 @@
-// Rutas del módulo CEO (Admin)
 export default [
   {
     path: '/ceo',
@@ -19,8 +18,14 @@ export default [
       {
         path: 'groups',
         name: 'CeoGroups',
-        component: () => import('@/views/ceo/components/Groups.vue'),
+        component: () => import('@/components/Groups.vue'),
         meta: { title: 'Gestión de Grupos' }
+      },
+      {
+        path: 'announcement',
+        name: 'CeoAnnouncement',
+        component: () => import('@/views/ceo/views/announcement/Announceent.vue'),
+        meta: { title: 'Anuncios' }
       }
     ]
   }
