@@ -30,6 +30,12 @@ const menuItems = [
         label: 'Grupos',
         icon: 'IconUsersGroup',
         route: { name: 'UserGroups' }
+      },
+      {
+        name: 'announcements',
+        label: 'Anuncios',
+        icon: 'IconMessageCircle',
+        route: { name: 'UserAnnouncement' }
       }
     ]
   }

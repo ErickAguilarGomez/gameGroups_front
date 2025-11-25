@@ -31,9 +31,7 @@
         </router-link>
       </div>
 
-      <AnnouncementSection :is-collapsed="isCollapsed" />
     </nav>
-
       <div class="sidebar-footer">
       <button @click="handleLogout" class="logout-btn">
         <IconLogout :size="20" />
@@ -45,7 +43,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import AnnouncementSection from '@/components/AnnouncementSection.vue'
 
 interface MenuItem {
   name: string

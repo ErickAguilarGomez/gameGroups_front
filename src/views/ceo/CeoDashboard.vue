@@ -16,42 +16,48 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '@/stores/authStore'
-import { useRouter } from 'vue-router'
+import { useAuthStore } from "@/stores/authStore";
+import { useRouter } from "vue-router";
 
-const authStore = useAuthStore()
-const router = useRouter()
+const authStore = useAuthStore();
+const router = useRouter();
 
 const menuItems = [
   {
-    title: 'Gestión',
+    title: "Gestión",
     items: [
       {
-        name: 'users',
-        label: 'Usuarios',
-        icon: 'IconUsers',
-        route: { name: 'CeoUsers' }
+        name: "users",
+        label: "Usuarios",
+        icon: "IconUsers",
+        route: { name: "CeoUsers" },
       },
       {
-        name: 'groups',
-        label: 'Grupos',
-        icon: 'IconUsersGroup',
-        route: { name: 'CeoGroups' }
+        name: "groups",
+        label: "Grupos",
+        icon: "IconUsersGroup",
+        route: { name: "CeoGroups" },
       },
       {
-        name: 'anuncios',
-        label: 'Anuncios',
-        icon: 'IconBell',
-        route: { name: 'CeoAnnouncement' }
-      }
-    ]
-  }
-]
+        name: "anuncios",
+        label: "Gestión de Anuncios",
+        icon: "IconBell",
+        route: { name: "CeoAnnouncement" },
+      },
+      {
+        name: "announcements",
+        label: "Anuncios",
+        icon: "IconMessageCircle",
+        route: { name: "CeoAnnouncementView" },
+      },
+    ],
+  },
+];
 
 const handleLogout = async () => {
-  await authStore.logout()
-  router.push({ name: 'Login' })
-}
+  await authStore.logout();
+  router.push({ name: "Login" });
+};
 </script>
 
 <style scoped>
