@@ -204,11 +204,6 @@ const tabs = [
     icon: "IconSpeakerphone",
   },
   {
-    key: "next",
-    label: "Proximos",
-    icon: "IconCalendarEvent",
-  },
-  {
     key: "inactive",
     label: "Inactivos",
     icon: "IconArchive",

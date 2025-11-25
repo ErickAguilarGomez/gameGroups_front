@@ -23,26 +23,26 @@
           <template v-else>
             <img @click="openImagePreview" :src="currentAnnouncement.url" :alt="currentAnnouncement.title" class="announcement-media" />
           </template>
+        </div>
 
-          <!-- small controls over the media -->
-          <div class="media-controls">
-            <button type="button" @click="prev" class="control-btn" aria-label="Anterior">
-              <IconChevronLeft :size="14"/>
-            </button>
-            <div class="indicators">
-              <button
-                v-for="(item, i) in announcements"
-                type="button"
-                :key="item.id"
-                :class="['dot', { active: i === currentIndex }]"
-                @click="goto(i)"
-                aria-label="Ir a anuncio"
-              ></button>
-            </div>
-            <button type="button" @click="next" class="control-btn" aria-label="Siguiente">
-              <IconChevronRight :size="14"/>
-            </button>
+        <!-- Controls below the media -->
+        <div class="media-controls">
+          <button type="button" @click="prev" class="control-btn" aria-label="Anterior">
+            <IconChevronLeft :size="20"/>
+          </button>
+          <div class="indicators">
+            <button
+              v-for="(item, i) in announcements"
+              type="button"
+              :key="item.id"
+              :class="['dot', { active: i === currentIndex }]"
+              @click="goto(i)"
+              aria-label="Ir a anuncio"
+            ></button>
           </div>
+          <button type="button" @click="next" class="control-btn" aria-label="Siguiente">
+            <IconChevronRight :size="20"/>
+          </button>
         </div>
 
         <div class="content-wrapper below">
@@ -78,6 +78,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, watch, toRef, Ref } from 'vue';
 import { useAnnouncementStore } from '@/stores/announcement';
+import { addPreloader, removePreloader } from '@/composables';
 
 interface Announcement {
   id: number | string;
@@ -179,9 +180,11 @@ const clearAuto = () => {
 };
 
 onMounted(async () => {
+  addPreloader();
   await announcementStore.fetchAnnouncements();
   if (announcements.value.length > 0) currentIndex.value = 0;
   startAuto();
+  removePreloader();
 });
 
 onBeforeUnmount(() => {
@@ -239,7 +242,7 @@ onBeforeUnmount(() => {
 
 .media-wrapper {
   width: 100%;
-  height: 320px;
+  height: 600px;
   position: relative;
   overflow: hidden;
   border-radius: 16px;
@@ -256,7 +259,7 @@ onBeforeUnmount(() => {
 .announcement-media {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
   transition: transform 0.5s ease;
 }
@@ -380,20 +383,12 @@ onBeforeUnmount(() => {
 }
 
 .media-controls {
-  position: absolute;
-  left: 1rem;
-  right: 1rem;
-  bottom: 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, rgba(15, 15, 35, 0.85) 0%, rgba(30, 30, 60, 0.75) 100%);
-  backdrop-filter: blur(20px);
-  border-radius: 50px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 0;
+  margin-top: 0.5rem;
 }
 
 .play-overlay {
@@ -429,24 +424,20 @@ onBeforeUnmount(() => {
 }
 
 .control-btn {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  width: 36px;
-  height: 36px;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  border-radius: 50%;
-  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   transition: all 0.2s ease;
+  padding: 0.5rem;
 }
 
 .control-btn:hover {
-  background: rgba(96, 165, 250, 0.3);
-  border-color: rgba(96, 165, 250, 0.4);
-  transform: scale(1.1);
+  color: #60a5fa;
+  transform: scale(1.15);
 }
 
 .control-btn:active {
@@ -497,7 +488,7 @@ onBeforeUnmount(() => {
   }
   
   .media-wrapper { 
-    height: 280px; 
+    height: 500px; 
   }
 }
 
@@ -512,7 +503,7 @@ onBeforeUnmount(() => {
   }
   
   .media-wrapper { 
-    height: 240px; 
+    height: 420px; 
   }
   
   .announcement-description {
@@ -540,7 +531,7 @@ onBeforeUnmount(() => {
   }
   
   .media-wrapper { 
-    height: 200px;
+    height: 380px;
     border-radius: 12px;
   }
   
@@ -592,7 +583,7 @@ onBeforeUnmount(() => {
   }
   
   .media-wrapper { 
-    height: 160px; 
+    height: 320px; 
   }
   
   .announcement-description {
