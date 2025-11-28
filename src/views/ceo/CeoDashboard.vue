@@ -62,6 +62,12 @@ const menuItems = [
         icon: "IconQuestionMark",
         route: { name: "CeoQuestionariesGeneral" },
       },
+      {
+        name: "inactiveQuestionaries",
+        label: "Encuestas Inactivas",
+        icon: "IconPower",
+        route: { name: "CeoInactiveQuestionaries" },
+      },
     ],
   },
 ];

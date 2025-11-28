@@ -34,23 +34,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, reactive } from "vue";
+import { ref, onMounted, computed, reactive, watch } from "vue";
 import { questionariesService } from "@/views/ceo/views/questionaries/Service/questionaries.service";
 import { Questionary } from "@/views/ceo/views/questionaries/interface/questionaries.interface";
 import { useAuthStore } from "@/stores/authStore";
 import { useAlert } from "@/composables/useAlert";
 import QuestionaryCard from "@/components/Questionaries/QuestionaryCard.vue";
 import ShowVotesModal from "@/components/Questionaries/showVotesModal.vue";
+import { useRoute } from "vue-router";
 
+//Data
 const questionaries = ref<Questionary[]>([]);
 const loading = ref(false);
 const authStore = useAuthStore();
 const { toast } = useAlert();
+const route = useRoute();
 
-// Voting state
 const selectedOptions = reactive<Record<number, number>>({});
-
-// Voters modal state
 const showVotersModal = ref(false);
 const selectedQuestionId = ref<number | null>(null);
 
@@ -58,9 +58,10 @@ const isUser = computed(() => authStore.user?.role_id === 2);
 
 const fetchQuestionaries = async () => {
   loading.value = true;
+  const currentStatus = route.meta.status as string;
   try {
     const data = await questionariesService.getQuestionariesWithStats({
-      status: "active",
+      status: currentStatus,
       user_id: authStore.user!.id,
     });
     questionaries.value = data;
@@ -102,6 +103,11 @@ const openVotersModal = (questionId: number) => {
 onMounted(() => {
   fetchQuestionaries();
 });
+
+watch(
+  () => route.meta.status,
+  () => fetchQuestionaries()
+);
 </script>
 
 <style scoped>

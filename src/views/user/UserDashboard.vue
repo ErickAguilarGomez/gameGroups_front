@@ -40,7 +40,7 @@ const menuItems = [
       {
         name: "questionaries",
         label: "Encuestas",
-        icon: "IconMessageCircle",
+        icon: "IconQuestionMark",
         route: { name: "UserQuestionaries" },
       },
     ],
