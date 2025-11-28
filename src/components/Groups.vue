@@ -85,7 +85,9 @@
                 <IconUser :size="20" />
               </div>
             </div>
-            <span class="user-name-mini">{{ user.name }}</span>
+            <span class="user-name-mini" v-b-tooltip.hover.top="user.name">{{
+              user.name
+            }}</span>
           </div>
           <div v-if="usersWithoutGroup.length === 0" class="empty-state">
             <IconMoodEmpty :size="48" />
@@ -135,7 +137,9 @@
                 <IconUser :size="20" />
               </div>
             </div>
-            <span class="user-name-mini">{{ user.name }}</span>
+            <span class="user-name-mini" v-b-tooltip.hover.top="user.name">{{
+              user.name
+            }}</span>
           </div>
         </div>
       </div>
@@ -214,7 +218,9 @@
                 <IconUser :size="20" />
               </div>
             </div>
-            <span class="user-name-mini">{{ user.name }}</span>
+            <span class="user-name-mini" v-b-tooltip.hover.top="user.name">{{
+              user.name
+            }}</span>
             <button
               v-if="canModerate"
               class="btn-remove-user"
@@ -263,7 +269,9 @@
                 <IconUser :size="20" />
               </div>
             </div>
-            <span class="user-name-mini">{{ user.name }}</span>
+            <span class="user-name-mini" v-b-tooltip.hover.top="user.name">{{
+              user.name
+            }}</span>
             <button
               v-if="canModerate"
               class="btn-unban-user"
@@ -636,7 +644,7 @@ async function deleteGroup(groupId: number) {
   border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s;
-  min-height: 300px;
+  height: 400px;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -734,6 +742,30 @@ async function deleteGroup(groupId: number) {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   gap: 1rem;
   flex: 1;
+  overflow-y: auto; /* Scroll cuando hay muchos usuarios */
+  max-height: calc(
+    400px - 150px
+  ); /* Altura máxima considerando header y padding */
+  padding-right: 0.5rem; /* Espacio para el scrollbar */
+}
+
+/* Scrollbar personalizado */
+.users-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.users-grid::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.users-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 217, 255, 0.3);
+  border-radius: 3px;
+}
+
+.users-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 217, 255, 0.5);
 }
 
 .user-card-mini {
@@ -748,6 +780,7 @@ async function deleteGroup(groupId: number) {
   transition: all 0.3s;
   cursor: pointer;
   position: relative;
+  height: 110px; /* Altura fija para tarjetas de usuario */
 }
 
 .user-card-mini:hover {
@@ -786,6 +819,14 @@ async function deleteGroup(groupId: number) {
   color: #e4e4e7;
   text-align: center;
   word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Máximo 2 líneas */
+  line-clamp: 2; /* Propiedad estándar para compatibilidad */
+  -webkit-box-orient: vertical;
+  width: 100%;
+  line-height: 1.2;
 }
 
 .user-card-mini.banned-user {
