@@ -1,3 +1,5 @@
+import path from "path";
+
 export default [
   {
     path: "/ceo",
@@ -33,6 +35,19 @@ export default [
         name: "CeoAnnouncementView",
         component: () => import("@/components/AnnouncementSection.vue"),
         meta: { title: "Anuncios" },
+      },
+      {
+        path: "questionaries",
+        name: "CeoQuestionaries",
+        component: () =>
+          import("@/views/ceo/views/questionaries/Questionaries.vue"),
+        meta: { title: "Gestion de Encuestas" },
+      },
+      {
+        path: "questionaries-general",
+        name: "CeoQuestionariesGeneral",
+        component: () => import("@/components/QuestionariesGeneral.vue"),
+        meta: { title: "Encuestas" },
       },
     ],
   },

@@ -51,7 +51,13 @@
           </div>
           <div class="info-content">
             <span class="info-label">Red Social</span>
-            <div v-if="userDetail.social_network_name && userDetail.social_network_logo_url" class="social-info">
+            <div
+              v-if="
+                userDetail.social_network_name &&
+                userDetail.social_network_logo_url
+              "
+              class="social-info"
+            >
               <img
                 :src="userDetail.social_network_logo_url"
                 :alt="userDetail.social_network_name"
@@ -116,7 +122,11 @@
 import { computed, onMounted, ref } from "vue";
 import { groupService } from "@/services/group.service";
 import { addPreloader, removePreloader } from "@/composables/usePreloader";
-import type { User, UserDetailModalProps, UserDetailModalEmits } from "@/interfaces/groups.interface";
+import type {
+  User,
+  UserDetailModalProps,
+  UserDetailModalEmits,
+} from "@/interfaces/groups.interface";
 const { showUserDetail } = groupService;
 
 //DATA
@@ -136,7 +146,6 @@ const isVisible = computed({
 onMounted(() => {
   getUserDetail();
 });
-
 
 //METHODS
 const handleClose = () => {
@@ -167,11 +176,10 @@ const formatDate = (date: string | null | undefined) => {
 };
 
 function flagUrl(slug?: string | null) {
-  if (!slug) return ''
-  const code = slug.toString().slice(0, 2).toLowerCase()
-  return `https://flagcdn.com/w40/${code}.png`
+  if (!slug) return "";
+  const code = slug.toString().slice(0, 2).toLowerCase();
+  return `https://flagcdn.com/w40/${code}.png`;
 }
-
 </script>
 
 <style scoped>
@@ -218,12 +226,10 @@ function flagUrl(slug?: string | null) {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0 0 0.5rem;
-  color: #18181b;
 }
 
 .user-email {
   font-size: 0.875rem;
-  color: #71717a;
   margin: 0;
 }
 
@@ -288,7 +294,7 @@ function flagUrl(slug?: string | null) {
   height: 20px;
   object-fit: cover;
   border-radius: 4px;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .social-info {

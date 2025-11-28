@@ -83,6 +83,7 @@ declare global {
   const usePreloader: typeof import('./src/composables/usePreloader').usePreloader
   const useRoute: typeof import('vue-router').useRoute
   const useRouter: typeof import('vue-router').useRouter
+  const useRuleStore: typeof import('./src/stores/ruleStore').useRuleStore
   const useSlots: typeof import('vue').useSlots
   const useTemplateRef: typeof import('vue').useTemplateRef
   const watch: typeof import('vue').watch
@@ -179,6 +180,7 @@ declare module 'vue' {
     readonly usePreloader: UnwrapRef<typeof import('./src/composables/usePreloader')['usePreloader']>
     readonly useRoute: UnwrapRef<typeof import('vue-router')['useRoute']>
     readonly useRouter: UnwrapRef<typeof import('vue-router')['useRouter']>
+    readonly useRuleStore: UnwrapRef<typeof import('./src/stores/ruleStore')['useRuleStore']>
     readonly useSlots: UnwrapRef<typeof import('vue')['useSlots']>
     readonly useTemplateRef: UnwrapRef<typeof import('vue')['useTemplateRef']>
     readonly watch: UnwrapRef<typeof import('vue')['watch']>

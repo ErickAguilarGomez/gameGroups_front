@@ -287,3 +287,41 @@
   border-color: rgba(255, 255, 255, 0.05);
   color: #71717a;
 }
+
+/* Global Modal Styles */
+.modal-content {
+  background: #0f0f23;
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  border-bottom: 2px solid rgba(0, 217, 255, 0.3);
+  padding: 1.5rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+  color: #e2e8f0;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.modal-body {
+  background: #0f0f23;
+  color: #e2e8f0;
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  background: #0f0f23;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem 1.5rem;
+  border-radius: 0 0 12px 12px;
+}
+
+.btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}

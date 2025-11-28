@@ -26,6 +26,12 @@ export default [
         component: () => import("@/components/AnnouncementSection.vue"),
         meta: { title: "Anuncios" },
       },
+      {
+        path: "questionaries",
+        name: "UserQuestionaries",
+        component: () => import("@/components/QuestionariesGeneral.vue"),
+        meta: { title: "Encuestas" },
+      },
     ],
   },
 ];

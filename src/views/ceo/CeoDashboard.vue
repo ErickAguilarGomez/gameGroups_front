@@ -50,6 +50,18 @@ const menuItems = [
         icon: "IconMessageCircle",
         route: { name: "CeoAnnouncementView" },
       },
+      {
+        name: "questionaries",
+        label: "Gestion de Encuestas",
+        icon: "IconSettings",
+        route: { name: "CeoQuestionaries" },
+      },
+      {
+        name: "questionariesGeneral",
+        label: "Encuestas",
+        icon: "IconQuestionMark",
+        route: { name: "CeoQuestionariesGeneral" },
+      },
     ],
   },
 ];

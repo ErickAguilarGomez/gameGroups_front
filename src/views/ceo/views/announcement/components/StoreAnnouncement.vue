@@ -62,14 +62,12 @@
             <BRow class="mb-3">
               <BCol md="3">
                 <p class="field-label">Fecha de Inicio</p>
-                <Field :rules="startDateRules" name="start_date">
+                <Field :rules="ruleStore.startDateRules" name="start_date">
                   <template #default="{ field, errorMessage }">
-                    <flat-pickr
+                    <CustomFlatPickr
                       id="start_date"
                       v-bind="field"
                       v-model="form.start_date"
-                      :config="dateTimeConfigStart"
-                      class="form-control"
                       placeholder="Selecciona fecha y hora de inicio"
                       :state="errorMessage ? false : null"
                       required
@@ -85,12 +83,11 @@
                 <p class="field-label">Fecha de Fin</p>
                 <Field :rules="endDateRules" name="end_date">
                   <template #default="{ field, errorMessage }">
-                    <flat-pickr
+                    <CustomFlatPickr
                       id="end_date"
                       v-bind="field"
                       v-model="form.end_date"
                       :config="dateTimeConfigEnd"
-                      class="form-control"
                       placeholder="Selecciona fecha y hora de fin"
                       :state="errorMessage ? false : null"
                       required
@@ -236,8 +233,6 @@
 <script setup lang="ts">
 import { ref, watch, computed, PropType, nextTick } from "vue";
 import ImageUploader from "@/components/ImageUploader.vue";
-import flatPickr from "vue-flatpickr-component";
-import { Spanish } from "flatpickr/dist/l10n/es";
 import { Form, Field } from "vee-validate";
 import { useAlert } from "@/composables/useAlert";
 import { announcementService } from "@/views/ceo/services/announcement";
@@ -245,6 +240,8 @@ import { addPreloader, removePreloader } from "@/composables/usePreloader";
 import { useAnnouncementStore } from "@/stores/announcement";
 import { useAuthStore } from "@/stores/authStore";
 import { uploadToCloudinary } from "@/services/cloudinaryService";
+import CustomFlatPickr from "@/components/CustomFlatPickr.vue";
+import { useRuleStore } from "@/stores/ruleStore";
 
 // Props and Emits
 const props = defineProps({
@@ -259,24 +256,9 @@ const formRef = ref();
 const fileInputNativeRef = ref<HTMLInputElement | null>(null);
 let previousObjectUrl: string | null = null;
 const fileInputKey = ref(0);
+const ruleStore = useRuleStore();
 
-const dateTimeConfigStart = ref({
-  enableTime: true,
-  dateFormat: "Y-m-d H:i",
-  time_24hr: true,
-  locale: Spanish,
-  allowInput: true,
-  minDate: new Date(),
-});
-
-const dateTimeConfigEnd = ref({
-  enableTime: true,
-  dateFormat: "Y-m-d H:i",
-  time_24hr: true,
-  locale: Spanish,
-  allowInput: true,
-  minDate: new Date(),
-});
+const dateTimeConfigEnd = ref<any>({});
 
 //DATA
 const isSubmitting = ref(false);
@@ -358,30 +340,8 @@ async function fetchAnnouncementById(id?: number | null) {
   }
 }
 
-const startDateRules = (value: unknown) => {
-  const v = value as string | Date | null;
-  if (!v) return "La fecha de inicio es requerida";
-  const date = v instanceof Date ? v : new Date(v as string);
-  if (isNaN(date.getTime())) return "Fecha de inicio inválida";
-  const now = new Date();
-  if (date < now)
-    return "La fecha de inicio no puede ser anterior a la fecha/hora actual";
-  return true;
-};
-
 const endDateRules = (value: unknown) => {
-  const v = value as string | Date | null;
-  if (!v) return "La fecha de fin es requerida";
-  const end = v instanceof Date ? v : new Date(v as string);
-  if (isNaN(end.getTime())) return "Fecha de fin inválida";
-  const startVal = form.value.start_date;
-  if (!startVal) return "Selecciona la fecha de inicio primero";
-  const start =
-    startVal instanceof Date ? startVal : new Date(startVal as string);
-  if (isNaN(start.getTime())) return "Fecha de inicio inválida";
-  if (end <= start)
-    return "La fecha de fin debe ser mayor que la fecha de inicio";
-  return true;
+  return ruleStore.validateEndDate(value, form.value.start_date);
 };
 
 function updateFile(file: File | null) {
